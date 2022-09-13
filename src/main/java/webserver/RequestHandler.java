@@ -1,10 +1,11 @@
 package webserver;
 
-import java.io.*;
-import java.net.Socket;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.Socket;
+import java.nio.file.Files;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -18,28 +19,27 @@ public class RequestHandler implements Runnable {
     }
 
     public void run() {
-        logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
-                connection.getPort());
+        logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, UTF_8));
-            String readLine;
-
-            while(!(readLine = br.readLine()).equals("")) {
-                logger.debug(readLine);
-
-                if (readLine == null) {
-                    break;
-                }
-            }
-
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+
+            var requestHeader = new RequestHeader(new RequestHeaderLine(br.readLine()));
+            byte[] body = getPageByUrl(requestHeader.getUrl());
+            successResponse(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private void successResponse(DataOutputStream dos, byte[] body) {
+        response200Header(dos, body.length);
+        responseBody(dos, body);
+    }
+
+    private byte[] getPageByUrl(String url) throws IOException {
+        return Files.readAllBytes(new File("./webapp" + url).toPath());
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
