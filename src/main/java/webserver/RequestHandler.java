@@ -26,11 +26,24 @@ public class RequestHandler implements Runnable {
             DataOutputStream dos = new DataOutputStream(out);
 
             var requestHeader = new RequestHeader(new RequestHeaderLine(br.readLine()));
-            byte[] body = getPageByUrl(requestHeader.getUrl());
+
+            var targetFile = new File("./webapp" + requestHeader.getUrl());
+
+            if (notFoundFile(targetFile)) {
+                byte[] body = "Not Found Page".getBytes();
+                notFoundResponse(dos, body);
+                return;
+            }
+
+            byte[] body = Files.readAllBytes(targetFile.toPath());
             successResponse(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private boolean notFoundFile(File targetFile) {
+        return !Files.isReadable(targetFile.toPath()) || Files.isDirectory(targetFile.toPath());
     }
 
     private void successResponse(DataOutputStream dos, byte[] body) {
@@ -38,8 +51,20 @@ public class RequestHandler implements Runnable {
         responseBody(dos, body);
     }
 
-    private byte[] getPageByUrl(String url) throws IOException {
-        return Files.readAllBytes(new File("./webapp" + url).toPath());
+    private void notFoundResponse(DataOutputStream dos, byte[] body) {
+        response404Header(dos, body.length);
+        responseBody(dos, body);
+    }
+
+    private void response404Header(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 404 NOT FOUND \r\n");
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
