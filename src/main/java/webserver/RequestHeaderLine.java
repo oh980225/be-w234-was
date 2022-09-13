@@ -5,13 +5,13 @@ public class RequestHeaderLine {
 
     public RequestHeaderLine(String readLine) {
         if (readLine == null || readLine.equals("")) {
-            throw new IllegalArgumentException("잘못된 요청입니다.");
+            throw new WebServerException(WebServerErrorMessage.EMPTY_REQUEST);
         }
 
         String[] tokens = readLine.split(" ");
 
         if (tokens.length != 3) {
-            throw new IllegalArgumentException("형식이 일치하지 않습니다.");
+            throw new WebServerException(WebServerErrorMessage.INVALID_FORMAT);
         }
 
         this.tokens = tokens;

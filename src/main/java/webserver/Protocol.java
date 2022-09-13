@@ -22,6 +22,6 @@ public enum Protocol {
             }
         }
 
-        throw new IllegalArgumentException("지원하지 않는 프로토콜입니다.");
+        throw new WebServerException(WebServerErrorMessage.INVALID_PROTOCOL);
     }
 }
