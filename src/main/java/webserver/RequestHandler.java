@@ -1,13 +1,13 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.Socket;
+import java.nio.file.Files;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -19,15 +19,49 @@ public class RequestHandler implements Runnable {
     }
 
     public void run() {
-        logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
-                connection.getPort());
+        logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, UTF_8));
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+
+            var requestHeader = new RequestHeader(new RequestHeaderLine(br.readLine()));
+
+            var targetFile = new File("./webapp" + requestHeader.getUrl());
+
+            if (notFoundFile(targetFile)) {
+                byte[] body = "Not Found Page".getBytes();
+                notFoundResponse(dos, body);
+                return;
+            }
+
+            byte[] body = Files.readAllBytes(targetFile.toPath());
+            successResponse(dos, body);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private boolean notFoundFile(File targetFile) {
+        return !Files.isReadable(targetFile.toPath()) || Files.isDirectory(targetFile.toPath());
+    }
+
+    private void successResponse(DataOutputStream dos, byte[] body) {
+        response200Header(dos, body.length);
+        responseBody(dos, body);
+    }
+
+    private void notFoundResponse(DataOutputStream dos, byte[] body) {
+        response404Header(dos, body.length);
+        responseBody(dos, body);
+    }
+
+    private void response404Header(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 404 NOT FOUND \r\n");
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
