@@ -1,9 +1,9 @@
 package webserver;
 
-public class RequestHeaderLine {
+public class RequestStartLine {
     private final String[] tokens;
 
-    public RequestHeaderLine(String readLine) {
+    public RequestStartLine(String readLine) {
         if (readLine == null || readLine.equals("")) {
             throw new WebServerException(WebServerErrorMessage.EMPTY_REQUEST);
         }

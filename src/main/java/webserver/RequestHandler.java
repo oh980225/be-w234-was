@@ -25,7 +25,7 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, UTF_8));
             DataOutputStream dos = new DataOutputStream(out);
 
-            var requestHeader = new RequestHeader(new RequestHeaderLine(br.readLine()));
+            var requestHeader = new RequestHeader(new RequestStartLine(br.readLine()));
 
             var targetFile = new File("./webapp" + requestHeader.getUrl());
 
