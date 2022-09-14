@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -25,62 +24,25 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, UTF_8));
             DataOutputStream dos = new DataOutputStream(out);
 
-            var requestHeader = new RequestHeader(new RequestStartLine(br.readLine()));
+            var request = new Request(new RequestStartLine(br.readLine()));
 
-            var targetFile = new File("./webapp" + requestHeader.getUrl());
+            var response = RequestExecutor.execute(request);
 
-            if (notFoundFile(targetFile)) {
-                byte[] body = "Not Found Page".getBytes();
-                notFoundResponse(dos, body);
-                return;
-            }
-
-            byte[] body = Files.readAllBytes(targetFile.toPath());
-            successResponse(dos, body);
+            writeResponseToOutputStream(dos, response);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private boolean notFoundFile(File targetFile) {
-        return !Files.isReadable(targetFile.toPath()) || Files.isDirectory(targetFile.toPath());
-    }
-
-    private void successResponse(DataOutputStream dos, byte[] body) {
-        response200Header(dos, body.length);
-        responseBody(dos, body);
-    }
-
-    private void notFoundResponse(DataOutputStream dos, byte[] body) {
-        response404Header(dos, body.length);
-        responseBody(dos, body);
-    }
-
-    private void response404Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void writeResponseToOutputStream(DataOutputStream dos, Response response) {
         try {
-            dos.writeBytes("HTTP/1.1 404 NOT FOUND \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes(response.getProtocol().getName() + " "
+                    + response.getStatusCode().getCode() + " "
+                    + response.getStatusCode().getMessage() + "\r\n"
+                    + "Content-Type: " + response.getContentType().getDetail() + "\r\n"
+                    + "Content-Length: " + response.getContentLength() + "\r\n");
             dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
+            dos.write(response.getBody(), 0, response.getContentLength());
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());

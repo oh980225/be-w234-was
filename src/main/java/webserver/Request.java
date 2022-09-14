@@ -1,13 +1,14 @@
 package webserver;
 
-public class RequestHeader {
+public class Request {
     private final HttpMethod method;
 
     private final String url;
+
     private final Protocol protocol;
 
 
-    public RequestHeader(RequestStartLine requestStartLine) {
+    public Request(RequestStartLine requestStartLine) {
         String[] tokens = requestStartLine.getTokens();
         method = HttpMethod.valueOf(tokens[0]);
         url = tokens[1];
@@ -16,5 +17,13 @@ public class RequestHeader {
 
     public String getUrl() {
         return url;
+    }
+
+    public HttpMethod getMethod() {
+        return method;
+    }
+
+    public Protocol getProtocol() {
+        return protocol;
     }
 }
