@@ -1,3 +1,8 @@
+### index.html 불러오기
 GET http://localhost:8080/index.html
 
-###
+### GET으로 회원가입
+GET http://localhost:8080/user/create?userId=oh980225&password=password&name=%EC%98%A4%EC%8A%B9%EC%9E%AC&email=oh980225%40naver.com
+
+### NOT FOUND
+GET http://localhost:8080/not

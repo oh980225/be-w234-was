@@ -2,7 +2,6 @@ package webserver;
 
 public enum Protocol {
     HTTP_1_1("HTTP/1.1"),
-    HTTP_2("HTTP/2"),
     ;
 
     Protocol(String name) {
