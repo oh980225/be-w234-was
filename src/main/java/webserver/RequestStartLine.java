@@ -1,10 +1,12 @@
 package webserver;
 
+import com.google.common.base.Strings;
+
 public class RequestStartLine {
     private final String[] tokens;
 
     public RequestStartLine(String readLine) {
-        if (readLine == null || readLine.equals("")) {
+        if (Strings.isNullOrEmpty(readLine)) {
             throw new WebServerException(WebServerErrorMessage.EMPTY_REQUEST);
         }
 

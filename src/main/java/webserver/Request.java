@@ -3,7 +3,7 @@ package webserver;
 public class Request {
     private final HttpMethod method;
 
-    private final String url;
+    private final Url url;
 
     private final Protocol protocol;
 
@@ -11,11 +11,11 @@ public class Request {
     public Request(RequestStartLine requestStartLine) {
         String[] tokens = requestStartLine.getTokens();
         method = HttpMethod.valueOf(tokens[0]);
-        url = tokens[1];
+        url = new Url(tokens[1]);
         protocol = Protocol.findByValue(tokens[2]);
     }
 
-    public String getUrl() {
+    public Url getUrl() {
         return url;
     }
 

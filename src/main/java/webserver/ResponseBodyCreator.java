@@ -1,5 +1,5 @@
 package webserver;
 
 public interface ResponseBodyCreator {
-    Response create(Request request);
+    byte[] create(Request request);
 }
