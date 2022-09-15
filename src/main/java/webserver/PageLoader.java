@@ -10,15 +10,17 @@ import java.nio.file.Files;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PageLoader {
     public static Response getPage(Request request) throws IOException {
-        var targetFile = new File("./webapp" + request.getRequestStartLine().getUrl().getPath());
+        String path = request.getRequestStartLine().getUrl().getPath();
+        Protocol protocol = request.getRequestStartLine().getProtocol();
+        var targetFile = new File("./webapp" + path);
 
         if (notFoundFile(targetFile)) {
-            return Response.notFound(request.getRequestStartLine().getProtocol());
+            return Response.notFound(protocol);
         }
 
         return Response.ok(
-                request.getRequestStartLine().getProtocol(),
-                ContentType.TEXT_HTML,
+                protocol,
+                ContentType.findByPath(path),
                 Files.readAllBytes(targetFile.toPath()));
     }
 
