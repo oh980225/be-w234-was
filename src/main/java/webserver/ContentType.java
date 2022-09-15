@@ -12,11 +12,9 @@ public enum ContentType {
 
     private final String detail;
 
-    public static ContentType findByPath(String path) {
-        String extension = getExtension(path);
-
+    public static ContentType findByExtension(Extension extension) {
         for (var contentType : ContentType.values()) {
-            if (contentType.getDetail().contains(extension)) {
+            if (contentType.getDetail().contains(extension.getExtension())) {
                 return contentType;
             }
         }
