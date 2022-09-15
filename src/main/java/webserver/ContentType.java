@@ -21,11 +21,4 @@ public enum ContentType {
 
         return TEXT_HTML;
     }
-
-    private static String getExtension(String path) {
-        var splitPath = path.split("/");
-        var splitLastPath = splitPath[splitPath.length - 1].split("\\.");
-        var extension = splitLastPath[splitLastPath.length - 1];
-        return extension;
-    }
 }
