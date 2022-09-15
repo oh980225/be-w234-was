@@ -9,7 +9,7 @@ import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RequestExecutor {
-    private static Map<RequestMapping, ResponseCreator> mappers = new HashMap<>();
+    private static Map<RequestMapping, RequestProcessable> mappers = new HashMap<>();
 
     static {
         mappers.put(RequestMapping.PAGE_LOAD, request -> {
@@ -27,7 +27,7 @@ public class RequestExecutor {
         try {
             return mappers.get(RequestMapping.valueOf(
                     request.getRequestStartLine().getMethod(),
-                    request.getRequestStartLine().getUrl().getPath())).create(request);
+                    request.getRequestStartLine().getUrl().getPath())).process(request);
         } catch (WebServerException e) {
             return Response.badRequest(request.getRequestStartLine().getProtocol(), e.getMessage());
         }
