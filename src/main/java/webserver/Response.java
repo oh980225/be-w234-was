@@ -1,5 +1,8 @@
 package webserver;
 
+import lombok.Getter;
+
+@Getter
 public class Response {
     private final Protocol protocol;
     private final StatusCode statusCode;
@@ -25,25 +28,5 @@ public class Response {
 
     public static Response notFound(Protocol protocol) {
         return new Response(protocol, StatusCode.NOT_FOUND, ContentType.TEXT_HTML, "NOT FOUND PAGE".getBytes());
-    }
-
-    public Protocol getProtocol() {
-        return protocol;
-    }
-
-    public StatusCode getStatusCode() {
-        return statusCode;
-    }
-
-    public ContentType getContentType() {
-        return contentType;
-    }
-
-    public int getContentLength() {
-        return contentLength;
-    }
-
-    public byte[] getBody() {
-        return body;
     }
 }

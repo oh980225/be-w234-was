@@ -1,16 +1,13 @@
 package webserver;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum Protocol {
     HTTP_1_1("HTTP/1.1"),
     ;
-
-    Protocol(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
 
     private final String name;
 

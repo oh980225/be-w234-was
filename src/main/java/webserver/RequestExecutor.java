@@ -1,9 +1,13 @@
 package webserver;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RequestExecutor {
     private static Map<RequestMapping, ResponseCreator> mappers = new HashMap<>();
 
@@ -21,9 +25,11 @@ public class RequestExecutor {
 
     public static Response execute(Request request) {
         try {
-            return mappers.get(RequestMapping.valueOf(request.getMethod(), request.getUrl().getPath())).create(request);
+            return mappers.get(RequestMapping.valueOf(
+                    request.getRequestStartLine().getMethod(),
+                    request.getRequestStartLine().getUrl().getPath())).create(request);
         } catch (WebServerException e) {
-            return Response.badRequest(request.getProtocol(), e.getMessage());
+            return Response.badRequest(request.getRequestStartLine().getProtocol(), e.getMessage());
         }
     }
 }

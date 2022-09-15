@@ -1,16 +1,12 @@
 package webserver;
 
-public enum ContentType {
-    TEXT_HTML("text/html;charset=utf-8")
-    ;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-    ContentType(String detail) {
-        this.detail = detail;
-    }
+@Getter
+@RequiredArgsConstructor
+public enum ContentType {
+    TEXT_HTML("text/html;charset=utf-8");
 
     private final String detail;
-
-    public String getDetail() {
-        return detail;
-    }
 }

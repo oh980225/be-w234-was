@@ -1,14 +1,12 @@
 package webserver;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public enum RequestMapping {
     PAGE_LOAD(HttpMethod.GET, ""),
     GET_SIGN_UP(HttpMethod.GET, "/user/create"),
     ;
-
-    RequestMapping(HttpMethod method, String path) {
-        this.method = method;
-        this.path = path;
-    }
 
     private final HttpMethod method;
     private final String path;

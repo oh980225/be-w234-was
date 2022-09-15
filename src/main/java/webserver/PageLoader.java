@@ -1,22 +1,23 @@
 package webserver;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PageLoader {
-    private PageLoader() {
-    }
-
     public static Response getPage(Request request) throws IOException {
-        var targetFile = new File("./webapp" + request.getUrl().getPath());
+        var targetFile = new File("./webapp" + request.getRequestStartLine().getUrl().getPath());
 
         if (notFoundFile(targetFile)) {
-            return Response.notFound(request.getProtocol());
+            return Response.notFound(request.getRequestStartLine().getProtocol());
         }
 
         return Response.ok(
-                request.getProtocol(),
+                request.getRequestStartLine().getProtocol(),
                 ContentType.TEXT_HTML,
                 Files.readAllBytes(targetFile.toPath()));
     }
