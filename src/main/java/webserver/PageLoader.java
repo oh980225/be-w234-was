@@ -8,14 +8,17 @@ public class PageLoader {
     private PageLoader() {
     }
 
-    public static byte[] getPage(Request request) throws IOException {
+    public static Response getPage(Request request) throws IOException {
         var targetFile = new File("./webapp" + request.getUrl().getPath());
 
         if (notFoundFile(targetFile)) {
-            throw new WebServerException(WebServerErrorMessage.NOT_FOUND);
+            return Response.notFound(request.getProtocol());
         }
 
-        return Files.readAllBytes(targetFile.toPath());
+        return Response.ok(
+                request.getProtocol(),
+                ContentType.TEXT_HTML,
+                Files.readAllBytes(targetFile.toPath()));
     }
 
     private static boolean notFoundFile(File targetFile) {

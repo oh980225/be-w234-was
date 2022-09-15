@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RequestExecutor {
-    private static Map<RequestMapping, ResponseBodyCreator> mappers = new HashMap<>();
+    private static Map<RequestMapping, ResponseCreator> mappers = new HashMap<>();
 
     static {
         mappers.put(RequestMapping.PAGE_LOAD, request -> {
@@ -21,15 +21,8 @@ public class RequestExecutor {
 
     public static Response execute(Request request) {
         try {
-            return Response.ok(
-                    request.getProtocol(),
-                    ContentType.TEXT_HTML,
-                    mappers.get(RequestMapping.valueOf(request.getMethod(), request.getUrl().getPath())).create(request));
+            return mappers.get(RequestMapping.valueOf(request.getMethod(), request.getUrl().getPath())).create(request);
         } catch (WebServerException e) {
-            if (e.getMessage().equals(WebServerErrorMessage.NOT_FOUND.getDetail())) {
-                return Response.notFound(request.getProtocol());
-            }
-
             return Response.badRequest(request.getProtocol(), e.getMessage());
         }
     }

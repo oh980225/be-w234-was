@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.URLDecoder;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -26,10 +25,8 @@ public class RequestHandler implements Runnable {
             DataOutputStream dos = new DataOutputStream(out);
 
             var request = new Request(new RequestStartLine(br.readLine()));
-            logger.debug("Request path : {}", URLDecoder.decode(request.getUrl().getPath(), UTF_8));
 
             var response = RequestExecutor.execute(request);
-
             writeResponseToOutputStream(dos, response);
         } catch (IOException e) {
             logger.error(e.getMessage());
