@@ -10,6 +10,8 @@ public class Response {
     private final int contentLength;
     private final byte[] body;
 
+    private final static String NOT_FOUND_CONTENT = "NOT FOUND PAGE";
+
     private Response(Protocol protocol, StatusCode statusCode, ContentType contentType, byte[] body) {
         this.protocol = protocol;
         this.statusCode = statusCode;
@@ -27,6 +29,6 @@ public class Response {
     }
 
     public static Response notFound(Protocol protocol) {
-        return new Response(protocol, StatusCode.NOT_FOUND, ContentType.TEXT_HTML, "NOT FOUND PAGE".getBytes());
+        return new Response(protocol, StatusCode.NOT_FOUND, ContentType.TEXT_HTML, NOT_FOUND_CONTENT.getBytes());
     }
 }

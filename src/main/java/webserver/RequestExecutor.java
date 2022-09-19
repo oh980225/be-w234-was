@@ -25,7 +25,7 @@ public class RequestExecutor {
 
     public static Response execute(Request request) {
         try {
-            return mappers.get(RequestMapping.valueOf(
+            return mappers.get(RequestMapping.findBy(
                     request.getRequestStartLine().getMethod(),
                     request.getRequestStartLine().getUrl().getPath())).process(request);
         } catch (WebServerException e) {

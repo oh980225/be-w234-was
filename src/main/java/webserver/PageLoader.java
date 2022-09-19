@@ -9,10 +9,12 @@ import java.nio.file.Files;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PageLoader {
+    private final static String STATIC_FILE_PATH = "./webapp";
+
     public static Response getPage(Request request) throws IOException {
         String path = request.getRequestStartLine().getUrl().getPath();
         Protocol protocol = request.getRequestStartLine().getProtocol();
-        var targetFile = new File("./webapp" + path);
+        var targetFile = new File(STATIC_FILE_PATH + path);
 
         if (notFoundFile(targetFile)) {
             return Response.notFound(protocol);

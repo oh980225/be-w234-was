@@ -17,11 +17,15 @@ public class Url {
         String[] splitUrl = url.split("\\?");
         this.path = splitUrl[0];
 
-        if (splitUrl.length == 2) {
+        if (hasQueryParam(splitUrl)) {
             this.query = HttpRequestUtils.parseQueryString(splitUrl[1]);
             return;
         }
 
         this.query = new HashMap<>();
+    }
+
+    private boolean hasQueryParam(String[] splitUrl) {
+        return splitUrl.length == 2;
     }
 }

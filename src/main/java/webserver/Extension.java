@@ -2,18 +2,21 @@ package webserver;
 
 import lombok.Getter;
 
+import java.util.regex.Pattern;
+
 @Getter
 public class Extension {
     private final String extension;
 
-    public Extension(String path) {
-        var splitPath = path.split("/");
-        var splitLastPath = splitPath[splitPath.length - 1].split("\\.");
+    private static final Pattern REGEX = Pattern.compile("(.+)\\.(.+)");
 
-        if (splitLastPath.length < 2) {
+    public Extension(String path) {
+        var matcher = REGEX.matcher(path);
+
+        if (!matcher.matches()) {
             throw new WebServerException(WebServerErrorMessage.NOT_EXIST_EXTENSION);
         }
 
-        this.extension = splitLastPath[splitLastPath.length - 1];
+        this.extension = matcher.group(2);
     }
 }
