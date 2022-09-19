@@ -20,7 +20,7 @@ public class PageLoader {
             return Response.notFound(protocol);
         }
 
-        return Response.ok(
+        return Response.okWithData(
                 protocol,
                 ContentType.findByExtension(new Extension(path)),
                 Files.readAllBytes(targetFile.toPath()));

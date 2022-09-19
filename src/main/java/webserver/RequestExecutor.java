@@ -21,6 +21,8 @@ public class RequestExecutor {
         });
 
         mappers.put(RequestMapping.GET_SIGN_UP, request -> UserAuthProvider.signUpForGet(request));
+
+        mappers.put(RequestMapping.SIGN_UP, request -> UserAuthProvider.signUp(request));
     }
 
     public static Response execute(Request request) {

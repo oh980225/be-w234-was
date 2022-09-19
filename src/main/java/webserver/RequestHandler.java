@@ -33,6 +33,7 @@ public class RequestHandler implements Runnable {
             var response = RequestExecutor.execute(getRequest(br));
 
             writeResponseToOutputStream(dos, response);
+            dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -81,18 +82,30 @@ public class RequestHandler implements Runnable {
         return new RequestHeader(content);
     }
 
-    private void writeResponseToOutputStream(DataOutputStream dos, Response response) {
-        try {
-            dos.writeBytes(response.getProtocol().getName() + " "
-                    + response.getStatusCode().getCode() + " "
-                    + response.getStatusCode().getMessage() + "\r\n"
-                    + "Content-Type: " + response.getContentType().getDetail() + "\r\n"
-                    + "Content-Length: " + response.getContentLength() + "\r\n");
-            dos.writeBytes("\r\n");
-            dos.write(response.getBody(), 0, response.getContentLength());
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+    private void writeResponseToOutputStream(DataOutputStream dos, Response response) throws IOException {
+        dos.writeBytes(response.getProtocol().getName() + " "
+                + response.getStatusCode().getCode() + " "
+                + response.getStatusCode().getMessage() + "\r\n");
+
+        if (response.hasBody()) {
+            writeResponseWithData(dos, response);
+            return;
         }
+
+        if (response.isRedirect()) {
+            writeRedirectResponse(dos, response);
+            return;
+        }
+    }
+
+    private void writeRedirectResponse(DataOutputStream dos, Response response) throws IOException {
+        dos.writeBytes("Location: " + response.getLocation().get() + "\r\n");
+    }
+
+    private void writeResponseWithData(DataOutputStream dos, Response response) throws IOException {
+        dos.writeBytes("Content-Type: " + response.getContentType().get().getDetail() + "\r\n");
+        dos.writeBytes("Content-Length: " + response.getContentLength().get() + "\r\n");
+        dos.writeBytes("\r\n");
+        dos.write(response.getBody().get(), 0, response.getContentLength().get());
     }
 }

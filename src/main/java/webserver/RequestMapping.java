@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 public enum RequestMapping {
     PAGE_LOAD(HttpMethod.GET, ""),
     GET_SIGN_UP(HttpMethod.GET, "/user/create"),
+    SIGN_UP(HttpMethod.POST, "/user/create"),
     ;
 
     private final HttpMethod method;

@@ -11,9 +11,16 @@ public class UserAuthProvider {
 
         Database.addUser(newUser);
 
-        return Response.ok(
-                request.getStartLine().getProtocol(),
-                ContentType.TEXT_HTML,
-                ("Sign Up " + newUser.getUserId()).getBytes());
+        return Response.ok(request.getStartLine().getProtocol());
+    }
+
+    public static Response signUp(Request request) {
+        var body = request.getBody();
+
+        var newUser = new User(body.get("userId"), body.get("password"), body.get("name"), body.get("email"));
+
+        Database.addUser(newUser);
+
+        return Response.redirect(request.getStartLine().getProtocol(), "/index.html");
     }
 }
