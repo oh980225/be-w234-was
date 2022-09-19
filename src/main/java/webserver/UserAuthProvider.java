@@ -5,14 +5,14 @@ import model.User;
 
 public class UserAuthProvider {
     public static Response signUpForGet(Request request) {
-        var query = request.getRequestStartLine().getUrl().getQuery();
+        var query = request.getStartLine().getUrl().getQuery();
 
         var newUser = new User(query.get("userId"), query.get("password"), query.get("name"), query.get("email"));
 
         Database.addUser(newUser);
 
         return Response.ok(
-                request.getRequestStartLine().getProtocol(),
+                request.getStartLine().getProtocol(),
                 ContentType.TEXT_HTML,
                 ("Sign Up " + newUser.getUserId()).getBytes());
     }

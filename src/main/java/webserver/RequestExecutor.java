@@ -26,10 +26,10 @@ public class RequestExecutor {
     public static Response execute(Request request) {
         try {
             return mappers.get(RequestMapping.findBy(
-                    request.getRequestStartLine().getMethod(),
-                    request.getRequestStartLine().getUrl().getPath())).process(request);
+                    request.getStartLine().getMethod(),
+                    request.getStartLine().getUrl().getPath())).process(request);
         } catch (WebServerException e) {
-            return Response.badRequest(request.getRequestStartLine().getProtocol(), e.getMessage());
+            return Response.badRequest(request.getStartLine().getProtocol(), e.getMessage());
         }
     }
 }

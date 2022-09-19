@@ -4,9 +4,10 @@ import lombok.Getter;
 import util.HttpRequestUtils;
 
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Getter
 public class Url {
@@ -14,7 +15,7 @@ public class Url {
     private final Map<String, String> query;
 
     public Url(String url) {
-        String[] splitUrl = url.split("\\?");
+        String[] splitUrl = URLDecoder.decode(url, UTF_8).split("\\?");
         this.path = splitUrl[0];
 
         if (hasQueryParam(splitUrl)) {

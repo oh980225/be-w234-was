@@ -12,8 +12,8 @@ public class PageLoader {
     private final static String STATIC_FILE_PATH = "./webapp";
 
     public static Response getPage(Request request) throws IOException {
-        String path = request.getRequestStartLine().getUrl().getPath();
-        Protocol protocol = request.getRequestStartLine().getProtocol();
+        String path = request.getStartLine().getUrl().getPath();
+        Protocol protocol = request.getStartLine().getProtocol();
         var targetFile = new File(STATIC_FILE_PATH + path);
 
         if (notFoundFile(targetFile)) {
