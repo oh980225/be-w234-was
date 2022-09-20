@@ -14,15 +14,15 @@ public class RequestExecutor {
     static {
         mappers.put(RequestMapping.PAGE_LOAD, request -> {
             try {
-                return PageLoader.getPage(request);
+                return PageController.getPage(request);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
 
-        mappers.put(RequestMapping.GET_SIGN_UP, request -> UserAuthProvider.signUpForGet(request));
+        mappers.put(RequestMapping.GET_SIGN_UP, request -> UserController.signUpForGet(request));
 
-        mappers.put(RequestMapping.SIGN_UP, request -> UserAuthProvider.signUp(request));
+        mappers.put(RequestMapping.POST_SIGN_UP, request -> UserController.signUpForPost(request));
     }
 
     public static Response execute(Request request) {
