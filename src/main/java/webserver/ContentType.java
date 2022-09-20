@@ -3,6 +3,8 @@ package webserver;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.regex.Pattern;
+
 @Getter
 @RequiredArgsConstructor
 public enum ContentType {

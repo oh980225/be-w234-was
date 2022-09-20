@@ -3,6 +3,8 @@ package webserver;
 import com.google.common.base.Strings;
 import lombok.Getter;
 
+import java.util.regex.Pattern;
+
 @Getter
 public class RequestStartLine {
     private final HttpMethod method;
@@ -11,19 +13,20 @@ public class RequestStartLine {
 
     private final Protocol protocol;
 
+    private static final Pattern REGEX = Pattern.compile("(\\S+)\\s(\\S+)\\s(\\S+)");
+
     public RequestStartLine(String readLine) {
         if (Strings.isNullOrEmpty(readLine)) {
             throw new WebServerException(WebServerErrorMessage.EMPTY_REQUEST);
         }
 
-        String[] tokens = readLine.split(" ");
-
-        if (tokens.length != 3) {
+        var matcher = REGEX.matcher(readLine);
+        if (!matcher.matches()) {
             throw new WebServerException(WebServerErrorMessage.INVALID_FORMAT);
         }
 
-        method = HttpMethod.valueOf(tokens[0]);
-        url = new Url(tokens[1]);
-        protocol = Protocol.findByValue(tokens[2]);
+        method = HttpMethod.valueOf(matcher.group(1));
+        url = new Url(matcher.group(2));
+        protocol = Protocol.findByName(matcher.group(3));
     }
 }

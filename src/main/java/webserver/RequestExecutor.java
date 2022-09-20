@@ -21,15 +21,17 @@ public class RequestExecutor {
         });
 
         mappers.put(RequestMapping.GET_SIGN_UP, request -> UserAuthProvider.signUpForGet(request));
+
+        mappers.put(RequestMapping.SIGN_UP, request -> UserAuthProvider.signUp(request));
     }
 
     public static Response execute(Request request) {
         try {
-            return mappers.get(RequestMapping.valueOf(
-                    request.getRequestStartLine().getMethod(),
-                    request.getRequestStartLine().getUrl().getPath())).process(request);
+            return mappers.get(RequestMapping.findBy(
+                    request.getStartLine().getMethod(),
+                    request.getStartLine().getUrl().getPath())).process(request);
         } catch (WebServerException e) {
-            return Response.badRequest(request.getRequestStartLine().getProtocol(), e.getMessage());
+            return Response.badRequest(request.getStartLine().getProtocol(), e.getMessage());
         }
     }
 }

@@ -11,9 +11,9 @@ public enum Protocol {
 
     private final String name;
 
-    public static Protocol findByValue(String value) {
+    public static Protocol findByName(String name) {
         for(var protocol : Protocol.values()) {
-            if(value.equals(protocol.getName())) {
+            if(name.equals(protocol.getName())) {
                 return protocol;
             }
         }
