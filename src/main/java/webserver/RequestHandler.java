@@ -85,29 +85,27 @@ public class RequestHandler implements Runnable {
     }
 
     private void writeResponseToOutputStream(DataOutputStream dos, Response response) throws IOException {
-        dos.writeBytes(response.getProtocol().getName() + " "
-                + response.getStatusCode().getCode() + " "
-                + response.getStatusCode().getMessage() + "\r\n");
+        writeReponseStatusLine(dos, response);
 
-        if (response.hasBody()) {
-            writeResponseWithData(dos, response);
-            return;
-        }
+        writeResponseHeader(dos, response);
 
-        if (response.isRedirect()) {
-            writeRedirectResponse(dos, response);
-            return;
+        writeResponseBody(dos, response);
+    }
+
+    private void writeReponseStatusLine(DataOutputStream dos, Response response) throws IOException {
+        dos.writeBytes(response.getStatusLine().toString() + "\r\n");
+    }
+
+    private void writeResponseHeader(DataOutputStream dos, Response response) throws IOException {
+        if (response.getHeader().isPresent()) {
+            dos.writeBytes(response.getHeader().get().toString());
         }
     }
 
-    private void writeRedirectResponse(DataOutputStream dos, Response response) throws IOException {
-        dos.writeBytes("Location: " + response.getLocation().get() + "\r\n");
-    }
-
-    private void writeResponseWithData(DataOutputStream dos, Response response) throws IOException {
-        dos.writeBytes("Content-Type: " + response.getContentType().get().getDetail() + "\r\n");
-        dos.writeBytes("Content-Length: " + response.getContentLength().get() + "\r\n");
-        dos.writeBytes("\r\n");
-        dos.write(response.getBody().get(), 0, response.getContentLength().get());
+    private void writeResponseBody(DataOutputStream dos, Response response) throws IOException {
+        if (response.getBody().isPresent()) {
+            dos.writeBytes("\r\n");
+            dos.write(response.getBody().get(), 0, response.getHeader().get().getContentLength());
+        }
     }
 }
