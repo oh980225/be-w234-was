@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserController {
     private static final String INDEX_PATH = "/index.html";
+    private static final String LOGIN_FAIL_PATH = "/user/login_failed.html";
 
     public static Response signUpForGet(Request request) {
         try {
@@ -34,14 +35,22 @@ public class UserController {
                     .name(body.get("name"))
                     .email(body.get("email"))
                     .build());
+
+            return Response.redirect(request.getStartLine().getProtocol(), INDEX_PATH);
         } catch (UserException e) {
             return Response.badRequest(request.getStartLine().getProtocol(), e.getMessage());
         }
-
-        return Response.redirect(request.getStartLine().getProtocol(), INDEX_PATH);
     }
 
     public static Response login(Request request) {
-        return null;
+        try {
+            var body = request.getBody();
+
+            UserAuthProvider.login(new LoginRequest(body.get("userId"), body.get("password")));
+
+            return Response.redirectWithCookie(request.getStartLine().getProtocol(), INDEX_PATH, "logined=true; Path=/");
+        } catch (UserException e) {
+            return Response.redirectWithCookie(request.getStartLine().getProtocol(), LOGIN_FAIL_PATH, "logined=false; Path=/");
+        }
     }
 }
