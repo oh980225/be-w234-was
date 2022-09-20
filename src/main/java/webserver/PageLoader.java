@@ -5,18 +5,17 @@ import lombok.NoArgsConstructor;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PageLoader {
-    public static Optional<File> getPageByPath(String path) {
+    public static File getPageByPath(String path) {
         var targetFile = new File(path);
 
         if (notFoundFile(targetFile)) {
-            return Optional.empty();
+            throw new WebServerException(WebServerErrorMessage.NOT_FOUND);
         }
 
-        return Optional.of(targetFile);
+        return targetFile;
     }
 
     private static boolean notFoundFile(File targetFile) {
