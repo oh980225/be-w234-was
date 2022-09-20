@@ -23,6 +23,8 @@ public class RequestExecutor {
         mappers.put(RequestMapping.GET_SIGN_UP, request -> UserController.signUpForGet(request));
 
         mappers.put(RequestMapping.POST_SIGN_UP, request -> UserController.signUpForPost(request));
+
+        mappers.put(RequestMapping.LOGIN, request -> UserController.login(request));
     }
 
     public static Response execute(Request request) {

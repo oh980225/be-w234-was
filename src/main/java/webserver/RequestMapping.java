@@ -7,6 +7,7 @@ public enum RequestMapping {
     PAGE_LOAD(HttpMethod.GET, ""),
     GET_SIGN_UP(HttpMethod.GET, "/user/create"),
     POST_SIGN_UP(HttpMethod.POST, "/user/create"),
+    LOGIN(HttpMethod.POST, "/user/login"),
     ;
 
     private final HttpMethod method;

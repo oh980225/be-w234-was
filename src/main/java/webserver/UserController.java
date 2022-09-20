@@ -40,4 +40,8 @@ public class UserController {
 
         return Response.redirect(request.getStartLine().getProtocol(), INDEX_PATH);
     }
+
+    public static Response login(Request request) {
+        return null;
+    }
 }

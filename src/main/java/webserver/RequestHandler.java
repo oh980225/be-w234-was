@@ -105,7 +105,9 @@ public class RequestHandler implements Runnable {
     private void writeResponseBody(DataOutputStream dos, Response response) throws IOException {
         if (response.getBody().isPresent()) {
             dos.writeBytes("\r\n");
-            dos.write(response.getBody().get(), 0, response.getHeader().get().getContentLength());
+            dos.write(response.getBody().get(),
+                    0,
+                    Integer.parseInt(response.getHeader().get().getContents().get("Content-Length")));
         }
     }
 }
