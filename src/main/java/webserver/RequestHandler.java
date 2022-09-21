@@ -103,11 +103,11 @@ public class RequestHandler implements Runnable {
     }
 
     private void writeResponseBody(DataOutputStream dos, Response response) throws IOException {
-        if (response.getBody().isPresent()) {
+        if (response.getBody().isPresent() && response.getHeader().isPresent()) {
             dos.writeBytes("\r\n");
             dos.write(response.getBody().get(),
                     0,
-                    Integer.parseInt(response.getHeader().get().getContents().get("Content-Length")));
+                    Integer.parseInt(response.getHeader().get().getContents().get(ResponseHeaderOption.CONTENT_LENGTH)));
         }
     }
 }
