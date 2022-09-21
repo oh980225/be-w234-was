@@ -79,6 +79,17 @@ public class Response {
                 .build();
     }
 
+    public static Response serverError(Protocol protocol, String message) {
+        var headerMap =
+                getHeaderMapForContent(ContentType.TEXT_HTML, message.getBytes().length);
+
+        return Response.builder()
+                .statusLine(new ResponseStatusLine(protocol, StatusCode.SERVER_ERROR))
+                .header(new ResponseHeader(headerMap))
+                .body(message.getBytes())
+                .build();
+    }
+
     public Optional<ResponseHeader> getHeader() {
         return Optional.ofNullable(header);
     }

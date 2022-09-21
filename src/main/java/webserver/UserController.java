@@ -20,11 +20,10 @@ public class UserController {
                     .name(query.get("name"))
                     .email(query.get("email"))
                     .build());
+            return Response.ok(request.getStartLine().getProtocol());
         } catch (UserException e) {
             return Response.badRequest(request.getStartLine().getProtocol(), e.getMessage());
         }
-
-        return Response.ok(request.getStartLine().getProtocol());
     }
 
     public static Response signUpForPost(Request request) {
