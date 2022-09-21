@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 public class UserController {
     private static final String INDEX_PATH = "/index.html";
     private static final String LOGIN_FAIL_PATH = "/user/login_failed.html";
+    private static final String LOGIN_SUCCESS_COOKIE = "logined=true; Path=/";
+    private static final String LOGIN_FAIL_COOKIE = "logined=false; Path=/";
 
     public static Response signUpForGet(Request request) {
         try {
@@ -48,9 +50,9 @@ public class UserController {
 
             UserAuthProvider.login(new LoginRequest(body.get("userId"), body.get("password")));
 
-            return Response.redirectWithCookie(request.getStartLine().getProtocol(), INDEX_PATH, "logined=true; Path=/");
+            return Response.redirectWithCookie(request.getStartLine().getProtocol(), INDEX_PATH, LOGIN_SUCCESS_COOKIE);
         } catch (UserException e) {
-            return Response.redirectWithCookie(request.getStartLine().getProtocol(), LOGIN_FAIL_PATH, "logined=false; Path=/");
+            return Response.redirectWithCookie(request.getStartLine().getProtocol(), LOGIN_FAIL_PATH, LOGIN_FAIL_COOKIE);
         }
     }
 }
