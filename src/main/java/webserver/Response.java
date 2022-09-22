@@ -1,63 +1,108 @@
 package webserver;
 
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
-@Getter
+@Builder(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class Response {
-    private final Protocol protocol;
-    private final StatusCode statusCode;
-    private Optional<ContentType> contentType = Optional.empty();
-    private Optional<Integer> contentLength = Optional.empty();
-    private Optional<byte[]> body = Optional.empty();
-
-    private Optional<String> location = Optional.empty();
+    @Getter
+    private final ResponseStatusLine statusLine;
+    private final ResponseHeader header;
+    private final byte[] body;
 
     private final static String NOT_FOUND_CONTENT = "NOT FOUND PAGE";
 
-    private Response(Protocol protocol, StatusCode statusCode) {
-        this.protocol = protocol;
-        this.statusCode = statusCode;
-    }
-
-    private Response(Protocol protocol, StatusCode statusCode, ContentType contentType, byte[] body) {
-        this(protocol, statusCode);
-        this.body = Optional.of(body);
-        this.contentType = Optional.of(contentType);
-        this.contentLength = Optional.of(body.length);
-    }
-
-    private Response(Protocol protocol, StatusCode statusCode, String location) {
-        this(protocol, statusCode);
-        this.location = Optional.of(location);
-    }
-
     public static Response okWithData(Protocol protocol, ContentType contentType, byte[] body) {
-        return new Response(protocol, StatusCode.OK, contentType, body);
+        var headerMap = getHeaderMapForContent(contentType, body.length);
+
+        return Response.builder()
+                .statusLine(new ResponseStatusLine(protocol, StatusCode.OK))
+                .header(new ResponseHeader(headerMap))
+                .body(body)
+                .build();
     }
 
     public static Response ok(Protocol protocol) {
-        return new Response(protocol, StatusCode.OK);
+        return Response.builder()
+                .statusLine(new ResponseStatusLine(protocol, StatusCode.OK))
+                .build();
     }
 
     public static Response badRequest(Protocol protocol, String message) {
-        return new Response(protocol, StatusCode.BAD_REQUEST, ContentType.TEXT_HTML, message.getBytes());
+        var headerMap =
+                getHeaderMapForContent(ContentType.TEXT_HTML, message.getBytes().length);
+
+        return Response.builder()
+                .statusLine(new ResponseStatusLine(protocol, StatusCode.BAD_REQUEST))
+                .header(new ResponseHeader(headerMap))
+                .body(message.getBytes())
+                .build();
     }
 
     public static Response notFound(Protocol protocol) {
-        return new Response(protocol, StatusCode.NOT_FOUND, ContentType.TEXT_HTML, NOT_FOUND_CONTENT.getBytes());
+        var headerMap =
+                getHeaderMapForContent(ContentType.TEXT_HTML, NOT_FOUND_CONTENT.getBytes().length);
+
+        return Response.builder()
+                .statusLine(new ResponseStatusLine(protocol, StatusCode.NOT_FOUND))
+                .header(new ResponseHeader(headerMap))
+                .body(NOT_FOUND_CONTENT.getBytes())
+                .build();
     }
 
     public static Response redirect(Protocol protocol, String location) {
-        return new Response(protocol, StatusCode.REDIRECT, location);
+        Map<ResponseHeaderOption, String> headerMap = new HashMap<>();
+        headerMap.put(ResponseHeaderOption.LOCATION, location);
+
+        return Response.builder()
+                .statusLine(new ResponseStatusLine(protocol, StatusCode.REDIRECT))
+                .header(new ResponseHeader(headerMap))
+                .build();
     }
 
-    public boolean hasBody() {
-        return getBody().isPresent() && getContentType().isPresent() && getContentLength().isPresent();
+    public static Response redirectWithCookie(Protocol protocol, String location, String cookieContents) {
+        Map<ResponseHeaderOption, String> headerMap = new HashMap<>();
+        headerMap.put(ResponseHeaderOption.SET_COOKIE, cookieContents);
+        headerMap.put(ResponseHeaderOption.LOCATION, location);
+
+
+        return Response.builder()
+                .statusLine(new ResponseStatusLine(protocol, StatusCode.REDIRECT))
+                .header(new ResponseHeader(headerMap))
+                .build();
     }
 
-    public boolean isRedirect() {
-        return getLocation().isPresent();
+    public static Response serverError(Protocol protocol, String message) {
+        var headerMap =
+                getHeaderMapForContent(ContentType.TEXT_HTML, message.getBytes().length);
+
+        return Response.builder()
+                .statusLine(new ResponseStatusLine(protocol, StatusCode.SERVER_ERROR))
+                .header(new ResponseHeader(headerMap))
+                .body(message.getBytes())
+                .build();
+    }
+
+    public Optional<ResponseHeader> getHeader() {
+        return Optional.ofNullable(header);
+    }
+
+    public Optional<byte[]> getBody() {
+        return Optional.ofNullable(body);
+    }
+
+    private static Map<ResponseHeaderOption, String> getHeaderMapForContent(ContentType contentType, int contentLength) {
+        Map<ResponseHeaderOption, String> headerMap = new HashMap<>();
+        headerMap.put(ResponseHeaderOption.CONTENT_TYPE, contentType.getDetail());
+        headerMap.put(ResponseHeaderOption.CONTENT_LENGTH, String.valueOf(contentLength));
+
+        return headerMap;
     }
 }

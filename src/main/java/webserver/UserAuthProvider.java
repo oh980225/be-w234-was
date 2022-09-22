@@ -1,26 +1,33 @@
 package webserver;
 
 import db.Database;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import model.User;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserAuthProvider {
-    public static Response signUpForGet(Request request) {
-        var query = request.getStartLine().getUrl().getQuery();
+    public static void signUp(SignUpRequest signUpRequest) {
+        if (Database.findUserById(signUpRequest.getUserId()).isPresent()) {
+            throw new UserException(UserErrorMessage.DUPLICATE_USER_ID);
+        }
 
-        var newUser = new User(query.get("userId"), query.get("password"), query.get("name"), query.get("email"));
+        var newUser = User.builder()
+                .userId(signUpRequest.getUserId())
+                .password(signUpRequest.getPassword())
+                .name(signUpRequest.getName())
+                .email(signUpRequest.getEmail())
+                .build();
 
         Database.addUser(newUser);
-
-        return Response.ok(request.getStartLine().getProtocol());
     }
 
-    public static Response signUp(Request request) {
-        var body = request.getBody();
+    public static void login(LoginRequest loginRequest) {
+        var existedUser = Database.findUserById(loginRequest.getUserId())
+                .orElseThrow(() -> new UserException(UserErrorMessage.NOT_EXIST_USER));
 
-        var newUser = new User(body.get("userId"), body.get("password"), body.get("name"), body.get("email"));
-
-        Database.addUser(newUser);
-
-        return Response.redirect(request.getStartLine().getProtocol(), "/index.html");
+        if (!existedUser.getPassword().equals(loginRequest.getPassword())) {
+            throw new UserException(UserErrorMessage.NOT_MATCH_PASSWORD);
+        }
     }
 }

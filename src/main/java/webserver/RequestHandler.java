@@ -24,7 +24,9 @@ public class RequestHandler implements Runnable {
     }
 
     public void run() {
-        logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
+        if (logger.isDebugEnabled()) {
+            logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
+        }
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, UTF_8));
@@ -83,29 +85,29 @@ public class RequestHandler implements Runnable {
     }
 
     private void writeResponseToOutputStream(DataOutputStream dos, Response response) throws IOException {
-        dos.writeBytes(response.getProtocol().getName() + " "
-                + response.getStatusCode().getCode() + " "
-                + response.getStatusCode().getMessage() + "\r\n");
+        writeReponseStatusLine(dos, response);
 
-        if (response.hasBody()) {
-            writeResponseWithData(dos, response);
-            return;
-        }
+        writeResponseHeader(dos, response);
 
-        if (response.isRedirect()) {
-            writeRedirectResponse(dos, response);
-            return;
+        writeResponseBody(dos, response);
+    }
+
+    private void writeReponseStatusLine(DataOutputStream dos, Response response) throws IOException {
+        dos.writeBytes(response.getStatusLine().toString() + "\r\n");
+    }
+
+    private void writeResponseHeader(DataOutputStream dos, Response response) throws IOException {
+        if (response.getHeader().isPresent()) {
+            dos.writeBytes(response.getHeader().get().toString());
         }
     }
 
-    private void writeRedirectResponse(DataOutputStream dos, Response response) throws IOException {
-        dos.writeBytes("Location: " + response.getLocation().get() + "\r\n");
-    }
-
-    private void writeResponseWithData(DataOutputStream dos, Response response) throws IOException {
-        dos.writeBytes("Content-Type: " + response.getContentType().get().getDetail() + "\r\n");
-        dos.writeBytes("Content-Length: " + response.getContentLength().get() + "\r\n");
-        dos.writeBytes("\r\n");
-        dos.write(response.getBody().get(), 0, response.getContentLength().get());
+    private void writeResponseBody(DataOutputStream dos, Response response) throws IOException {
+        if (response.getBody().isPresent() && response.getHeader().isPresent()) {
+            dos.writeBytes("\r\n");
+            dos.write(response.getBody().get(),
+                    0,
+                    Integer.parseInt(response.getHeader().get().getContents().get(ResponseHeaderOption.CONTENT_LENGTH)));
+        }
     }
 }

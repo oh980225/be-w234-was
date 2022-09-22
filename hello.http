@@ -4,5 +4,16 @@ GET http://localhost:8080/index.html
 ### GET으로 회원가입
 GET http://localhost:8080/user/create?userId=oh980225&password=password&name=%EC%98%A4%EC%8A%B9%EC%9E%AC&email=oh980225%40naver.com
 
+### POST로 회원가입
+POST http://localhost:8080/user/create
+
+userId=oh980225&password=password&name=%EC%98%A4%EC%8A%B9%EC%9E%AC&email=oh980225%40naver.com
+
 ### NOT FOUND
-GET http://localhost:8080/not
+GET http://localhost:8080/not_found
+
+## 회원가입이 우선시 되야합니다.
+### 로그인
+POST http://localhost:8080/user/login
+
+userId=oh980225&password=password

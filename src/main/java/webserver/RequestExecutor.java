@@ -3,7 +3,6 @@ package webserver;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,26 +11,24 @@ public class RequestExecutor {
     private static Map<RequestMapping, RequestProcessable> mappers = new HashMap<>();
 
     static {
-        mappers.put(RequestMapping.PAGE_LOAD, request -> {
-            try {
-                return PageLoader.getPage(request);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        mappers.put(RequestMapping.GET_SIGN_UP, request -> UserAuthProvider.signUpForGet(request));
-
-        mappers.put(RequestMapping.SIGN_UP, request -> UserAuthProvider.signUp(request));
+        mappers.put(new RequestMapping(HttpMethod.GET, "/user/create"), request -> UserController.signUpForGet(request));
+        mappers.put(new RequestMapping(HttpMethod.POST, "/user/create"), request -> UserController.signUpForPost(request));
+        mappers.put(new RequestMapping(HttpMethod.POST, "/user/login"), request -> UserController.login(request));
     }
 
     public static Response execute(Request request) {
         try {
-            return mappers.get(RequestMapping.findBy(
+            var requestMapping = new RequestMapping(
                     request.getStartLine().getMethod(),
-                    request.getStartLine().getUrl().getPath())).process(request);
-        } catch (WebServerException e) {
-            return Response.badRequest(request.getStartLine().getProtocol(), e.getMessage());
+                    request.getStartLine().getUrl().getPath());
+
+            if (mappers.get(requestMapping) == null) {
+                return PageController.getPage(request);
+            }
+
+            return mappers.get(requestMapping).process(request);
+        } catch (Exception e) {
+            return Response.serverError(request.getStartLine().getProtocol(), e.getMessage());
         }
     }
 }
