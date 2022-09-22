@@ -15,6 +15,7 @@ dependencies {
 
     implementation 'com.google.guava:guava:29.0-jre'
     implementation 'ch.qos.logback:logback-classic:1.2.3'
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.3'
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
