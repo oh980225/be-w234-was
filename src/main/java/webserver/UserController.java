@@ -8,6 +8,7 @@ import java.io.IOException;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserController {
     private static final String INDEX_PATH = "/index.html";
+    private static final String LOGIN_PATH = "/user/login.html";
     private static final String LOGIN_FAIL_PATH = "/user/login_failed.html";
     private static final String USER_LIST_PATH = "webapp/user/list.html";
     private static final String LOGIN_SUCCESS_COOKIE = "logined=true; Path=/";
@@ -59,11 +60,19 @@ public class UserController {
     }
 
     public static Response findAllUser(Request request) throws IOException {
+        if (isUnAuthenticated(request)) {
+            return Response.redirect(request.getStartLine().getProtocol(), LOGIN_PATH);
+        }
+
         var allUser = UserFinder.findAll();
 
         return Response.okWithData(
                 request.getStartLine().getProtocol(),
                 ContentType.TEXT_HTML,
                 HTMLTableMaker.makeUserTable(USER_LIST_PATH, allUser).getBytes());
+    }
+
+    private static boolean isUnAuthenticated(Request request) {
+        return !Boolean.parseBoolean(request.getHeader().getCookieMap().get("logined"));
     }
 }

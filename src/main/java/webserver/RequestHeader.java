@@ -1,6 +1,7 @@
 package webserver;
 
 import lombok.RequiredArgsConstructor;
+import util.HttpRequestUtils;
 
 import java.util.Map;
 
@@ -9,8 +10,15 @@ public class RequestHeader {
     private final Map<String, String> contents;
     private final String CONTENT_LENGTH = "Content-Length";
 
+    private final String COOKIE = "Cookie";
+
+
     public int getContentLength() {
         var length = contents.get(CONTENT_LENGTH);
         return length == null ? 0 : Integer.parseInt(length);
+    }
+
+    public Map<String, String> getCookieMap() {
+        return HttpRequestUtils.parseCookies(contents.get(COOKIE));
     }
 }
