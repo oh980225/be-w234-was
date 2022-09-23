@@ -18,7 +18,7 @@ public class RequestHeader {
         return length == null ? 0 : Integer.parseInt(length);
     }
 
-    public Map<String, String> getCookieMap() {
-        return HttpRequestUtils.parseCookies(contents.get(COOKIE));
+    public Cookie getCookie() {
+        return new Cookie(HttpRequestUtils.parseCookies(contents.get(COOKIE)));
     }
 }

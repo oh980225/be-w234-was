@@ -60,7 +60,7 @@ public class UserController {
     }
 
     public static Response findAllUser(Request request) throws IOException {
-        if (isUnAuthenticated(request)) {
+        if (!request.getHeader().getCookie().isLogined()) {
             return Response.redirect(request.getStartLine().getProtocol(), LOGIN_PATH);
         }
 
@@ -70,9 +70,5 @@ public class UserController {
                 request.getStartLine().getProtocol(),
                 ContentType.TEXT_HTML,
                 HTMLTableMaker.makeUserTable(USER_LIST_PATH, allUser).getBytes());
-    }
-
-    private static boolean isUnAuthenticated(Request request) {
-        return !Boolean.parseBoolean(request.getHeader().getCookieMap().get("logined"));
     }
 }
