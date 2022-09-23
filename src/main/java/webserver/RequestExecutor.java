@@ -14,6 +14,7 @@ public class RequestExecutor {
         mappers.put(new RequestMapping(HttpMethod.GET, "/user/create"), UserController::signUpForGet);
         mappers.put(new RequestMapping(HttpMethod.POST, "/user/create"), UserController::signUpForPost);
         mappers.put(new RequestMapping(HttpMethod.POST, "/user/login"), UserController::login);
+        mappers.put(new RequestMapping(HttpMethod.GET, "/user/list"), UserController::findAllUser);
     }
 
     public static Response execute(Request request) {
