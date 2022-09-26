@@ -11,9 +11,10 @@ public class RequestExecutor {
     private static Map<RequestMapping, RequestProcessable> mappers = new HashMap<>();
 
     static {
-        mappers.put(new RequestMapping(HttpMethod.GET, "/user/create"), request -> UserController.signUpForGet(request));
-        mappers.put(new RequestMapping(HttpMethod.POST, "/user/create"), request -> UserController.signUpForPost(request));
-        mappers.put(new RequestMapping(HttpMethod.POST, "/user/login"), request -> UserController.login(request));
+        mappers.put(new RequestMapping(HttpMethod.GET, "/user/create"), UserController::signUpForGet);
+        mappers.put(new RequestMapping(HttpMethod.POST, "/user/create"), UserController::signUpForPost);
+        mappers.put(new RequestMapping(HttpMethod.POST, "/user/login"), UserController::login);
+        mappers.put(new RequestMapping(HttpMethod.GET, "/user/list"), UserController::findAllUser);
     }
 
     public static Response execute(Request request) {

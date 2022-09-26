@@ -87,6 +87,82 @@
 - 복합인덱스를 만들때는 컬럼의 순서가 중요하다!
 ```
 
+### 강의4
+* DB의 락은 테이블, 칼럼, 레코드, 인덱스, 특정 범위에도 걸 수 있다.
+
+* MySQL의 기본 스토리지 엔진은 InnoDB이다.
+
+* 스토리지 엔진은 다른 것도 존재하고 변경할 수 있다.
+
+* InnoDB는 레코드 기반 저장구조이다.
+
+* Amazon의 RedShift같은 경우는 column store이다. 그렇기에 통계를 내는 것에는 더 효율적이다.
+
+* Secondary Index는 PK를 참조한다.
+
+* 레코드 기반 잠금을 지원하지만 실제 물리적 잠금은 인덱스에 걸린다.
+
+* 트랜잭셕의 성질은 ACID가 있다.
+
+* 추가적으로 분산시스템의 기본 성질인 CAP이론이라는 것이 있다.
+```markdown
+- C(Consistency) : 일관성
+- A(Availability : 가용성
+- P(Partition tolerance) : 분단 허용성
+```
+
+* CAP를 모두 만족시키는 시스템은 구현할 수 없다. 많은 NoSQL은 일관성을 포기한다.
+
+* Optimistic Concurrency Control VS Pessimistic Lock
+  * **Optimistic Concurrency Control** : 여러 트랜잭션이 서로 간섭하지 않고 자주 완료될 수 있다고 가정. 트랜잭션은 해당 리소스에 대한 잠금을 획득하지 않고 데이터 리소스를 사용. 처리량이 높아진다는 장점이 있으나 리소스 경합이 빈번해 질경우 문제 발생
+  * **Pessimistic Lock** : 해당 리소스에 대한 잠금을 획득하여 데이터 리소스를 사용. 위 낙관적 동시성 제어보다는 처리량이 낮지만, 리소스 경합으로 인한 문제 방지
+
+* Transaction에서 발생할 수 있는 **문제들**
+```markdown
+Dirty Read Problem
+- 한 트랜잭션에서 변경한 값을 다른 트랜잭션에서 읽을 때 발생하는 문제
+- 이때 변경한 값이 Rollback될 경우 문제 발생
+
+Non-repeatable Read Problem
+- 한 트랜잭션에서 같은 값을 두 번 읽었을 때 각각 다른 값이 읽히는 경우
+
+Phantom Read Problem
+- 주로 통계나 분석, aggregation function 등을 수행하는 쿼리에서 잘못된 값이 들어오는 경우
+- 조회했을 때는 변경 사항이 없었으나, 통계를 낼 때 변경된 값으로 통계가 계산되는 등
+```
+
+* Transaction **Isolation Level**
+```markdown
+Read Uncommitted
+- 다른 트랜잭션에서 바꾼 값이 트랜잭션 중간에도 반영
+- 다른 값이 읽힐 수 있음. (옳지 않은 값)
+- 일반적으로 그냥 최신 업데이트 값을 읽음
+- 상당히 위험 
+  
+Read Committed
+- 커밋된 아이템을 읽을 수 있는 모드
+- 커밋되지 않은 값은 읽을 수 없음
+- 같은 트랜잭션에서는 최근의 스냅샷을 읽음
+
+Repeatable Read
+- MySQL의 기본 동작 모드
+- 첫 번째 읽기에 스냅샷을 생성
+- 이후 동일 트랜잭션에서는 스냅샷에서부터 값을 읽음
+- 잠금의 대상은 unique index, secoendary index의 유무에 따라 달라짐
+
+
+Serializable
+- MySQL에서는 모든 SELECT문에 공유락
+- Repeatable Read에서도 Phantom 문제가 발생하지 않으므로 많이 사용하지 않음
+- 역시나 매우 위험 -> 매우매우 느림
+```
+
+* MySQL의 기본 모드는 Repeatable Read이다. 그런데도 MySQL의 Repeatable Read는 팬텀 리드 문제가 발생하지 않는다고 한다.
+
+* transaction의 isolation level은 세션별로도 지정해줄 수 있다.
+
+* MySQL에는 다양한 락의 종류가 있다.
+
 ## 테스트/실행 방법
 ### 실행 방법
 * "src/main/java/webserver/WebServer.java" 에 있는 main 함수를 실행하여 프로그램을 띄울 수 있습니다.

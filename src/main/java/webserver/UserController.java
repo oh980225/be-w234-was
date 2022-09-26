@@ -3,10 +3,14 @@ package webserver;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.io.IOException;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserController {
     private static final String INDEX_PATH = "/index.html";
+    private static final String LOGIN_PATH = "/user/login.html";
     private static final String LOGIN_FAIL_PATH = "/user/login_failed.html";
+    private static final String USER_LIST_PATH = "webapp/user/list.html";
     private static final String LOGIN_SUCCESS_COOKIE = "logined=true; Path=/";
     private static final String LOGIN_FAIL_COOKIE = "logined=false; Path=/";
 
@@ -53,5 +57,18 @@ public class UserController {
         } catch (UserException e) {
             return Response.redirectWithCookie(request.getStartLine().getProtocol(), LOGIN_FAIL_PATH, LOGIN_FAIL_COOKIE);
         }
+    }
+
+    public static Response findAllUser(Request request) throws IOException {
+        if (!request.getHeader().getCookie().isLogined()) {
+            return Response.redirect(request.getStartLine().getProtocol(), LOGIN_PATH);
+        }
+
+        var allUser = UserFinder.findAll();
+
+        return Response.okWithData(
+                request.getStartLine().getProtocol(),
+                ContentType.TEXT_HTML,
+                HTMLTableMaker.makeUserTable(USER_LIST_PATH, allUser).getBytes());
     }
 }
