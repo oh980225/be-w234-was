@@ -10,7 +10,7 @@ public class Cookie {
 
     private final String LOGINED = "logined";
 
-    boolean isLogined() {
+    public boolean isLogined() {
         return Boolean.parseBoolean(contents.get(LOGINED));
     }
 }

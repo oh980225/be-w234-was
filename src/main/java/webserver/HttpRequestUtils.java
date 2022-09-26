@@ -1,32 +1,30 @@
-package util;
+package webserver;
+
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
-
-public class HttpRequestUtils {
+class HttpRequestUtils {
     /**
-     * @param queryString은
-     *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
+     * @param queryString은 URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
      * @return
      */
-    public static Map<String, String> parseQueryString(String queryString) {
+    static Map<String, String> parseQueryString(String queryString) {
         return parseValues(queryString, "&");
     }
 
     /**
-     * @param 쿠키
-     *            값은 name1=value1; name2=value2 형식임
+     * @param 쿠키 값은 name1=value1; name2=value2 형식임
      * @return
      */
-    public static Map<String, String> parseCookies(String cookies) {
+    static Map<String, String> parseCookies(String cookies) {
         return parseValues(cookies, ";");
     }
 
-    private static Map<String, String> parseValues(String values, String separator) {
+    static Map<String, String> parseValues(String values, String separator) {
         if (Strings.isNullOrEmpty(values)) {
             return Maps.newHashMap();
         }
@@ -49,11 +47,11 @@ public class HttpRequestUtils {
         return new Pair(tokens[0], tokens[1]);
     }
 
-    public static Pair parseHeader(String header) {
+    static Pair parseHeader(String header) {
         return getKeyValue(header, ": ");
     }
 
-    public static class Pair {
+    static class Pair {
         String key;
         String value;
 

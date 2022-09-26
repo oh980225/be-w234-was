@@ -1,4 +1,4 @@
-package webserver;
+package user;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

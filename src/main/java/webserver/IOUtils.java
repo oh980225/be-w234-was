@@ -1,9 +1,9 @@
-package util;
+package webserver;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 
-public class IOUtils {
+class IOUtils {
     /**
      * @param BufferedReader는
      *            Request Body를 시작하는 시점이어야
@@ -12,7 +12,7 @@ public class IOUtils {
      * @return
      * @throws IOException
      */
-    public static String readData(BufferedReader br, int contentLength) throws IOException {
+    static String readData(BufferedReader br, int contentLength) throws IOException {
         char[] body = new char[contentLength];
         br.read(body, 0, contentLength);
         return String.copyValueOf(body);

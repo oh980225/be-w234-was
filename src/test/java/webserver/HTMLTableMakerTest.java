@@ -1,6 +1,6 @@
 package webserver;
 
-import model.User;
+import user.User;
 import org.jsoup.Jsoup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

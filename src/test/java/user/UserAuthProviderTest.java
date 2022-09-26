@@ -1,7 +1,7 @@
-package webserver;
+package user;
 
 import db.Database;
-import model.User;
+import user.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

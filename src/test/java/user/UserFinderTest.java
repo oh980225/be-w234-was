@@ -1,9 +1,10 @@
-package webserver;
+package user;
 
 import db.Database;
-import model.User;
+import user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import user.UserFinder;
 
 import java.util.Set;
 

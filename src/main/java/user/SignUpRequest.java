@@ -1,11 +1,11 @@
-package model;
+package user;
 
 import lombok.Builder;
 import lombok.Value;
 
 @Builder
 @Value
-public class User {
+class SignUpRequest {
     String userId;
     String password;
     String name;

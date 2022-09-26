@@ -1,7 +1,8 @@
-package webserver;
+package user;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import webserver.*;
 
 import java.io.IOException;
 

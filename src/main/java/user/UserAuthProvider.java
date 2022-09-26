@@ -1,12 +1,11 @@
-package webserver;
+package user;
 
 import db.Database;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import model.User;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserAuthProvider {
+class UserAuthProvider {
     public static void signUp(SignUpRequest signUpRequest) {
         if (Database.findUserById(signUpRequest.getUserId()).isPresent()) {
             throw new UserException(UserErrorMessage.DUPLICATE_USER_ID);

@@ -1,7 +1,6 @@
-package webserver;
+package user;
 
 import db.Database;
-import model.User;
 
 import java.util.HashSet;
 import java.util.Set;

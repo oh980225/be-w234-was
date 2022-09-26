@@ -1,6 +1,6 @@
 package webserver;
 
-import model.User;
+import user.User;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,8 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
-class HTMLTableMaker {
-    static String makeUserTable(String htmlPath, Collection<User> users) throws IOException {
+public class HTMLTableMaker {
+    public static String makeUserTable(String htmlPath, Collection<User> users) throws IOException {
         var document = Jsoup.parse(new File(htmlPath), "UTF-8");
 
         var table = getTableClassElement(document);
