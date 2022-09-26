@@ -1,25 +1,30 @@
 package user;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import webserver.*;
+import lombok.RequiredArgsConstructor;
+import webserver.ContentType;
+import webserver.HTMLTableMaker;
+import webserver.Request;
+import webserver.Response;
 
 import java.io.IOException;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class UserController {
-    private static final String INDEX_PATH = "/index.html";
-    private static final String LOGIN_PATH = "/user/login.html";
-    private static final String LOGIN_FAIL_PATH = "/user/login_failed.html";
-    private static final String USER_LIST_PATH = "webapp/user/list.html";
-    private static final String LOGIN_SUCCESS_COOKIE = "logined=true; Path=/";
-    private static final String LOGIN_FAIL_COOKIE = "logined=false; Path=/";
+    private final String INDEX_PATH = "/index.html";
+    private final String LOGIN_PATH = "/user/login.html";
+    private final String LOGIN_FAIL_PATH = "/user/login_failed.html";
+    private final String USER_LIST_PATH = "webapp/user/list.html";
+    private final String LOGIN_SUCCESS_COOKIE = "logined=true; Path=/";
+    private final String LOGIN_FAIL_COOKIE = "logined=false; Path=/";
 
-    public static Response signUpForGet(Request request) {
+    private final UserAuthProvider userAuthProvider;
+    private final UserFinder userFinder;
+
+    public Response signUpForGet(Request request) {
         try {
             var query = request.getStartLine().getUrl().getQuery();
 
-            UserAuthProvider.signUp(SignUpRequest.builder()
+            userAuthProvider.signUp(SignUpRequest.builder()
                     .userId(query.get("userId"))
                     .password(query.get("password"))
                     .name(query.get("name"))
@@ -31,11 +36,11 @@ public class UserController {
         }
     }
 
-    public static Response signUpForPost(Request request) {
+    public Response signUpForPost(Request request) {
         try {
             var body = request.getBody();
 
-            UserAuthProvider.signUp(SignUpRequest.builder()
+            userAuthProvider.signUp(SignUpRequest.builder()
                     .userId(body.get("userId"))
                     .password(body.get("password"))
                     .name(body.get("name"))
@@ -48,11 +53,11 @@ public class UserController {
         }
     }
 
-    public static Response login(Request request) {
+    public Response login(Request request) {
         try {
             var body = request.getBody();
 
-            UserAuthProvider.login(new LoginRequest(body.get("userId"), body.get("password")));
+            userAuthProvider.login(new LoginRequest(body.get("userId"), body.get("password")));
 
             return Response.redirectWithCookie(request.getStartLine().getProtocol(), INDEX_PATH, LOGIN_SUCCESS_COOKIE);
         } catch (UserException e) {
@@ -60,12 +65,12 @@ public class UserController {
         }
     }
 
-    public static Response findAllUser(Request request) throws IOException {
+    public Response findAllUser(Request request) throws IOException {
         if (!request.getHeader().getCookie().isLogined()) {
             return Response.redirect(request.getStartLine().getProtocol(), LOGIN_PATH);
         }
 
-        var allUser = UserFinder.findAll();
+        var allUser = userFinder.findAll();
 
         return Response.okWithData(
                 request.getStartLine().getProtocol(),

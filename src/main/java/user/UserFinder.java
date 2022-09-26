@@ -1,12 +1,14 @@
 package user;
 
-import db.Database;
+import lombok.RequiredArgsConstructor;
 
-import java.util.HashSet;
 import java.util.Set;
 
+@RequiredArgsConstructor
 public class UserFinder {
-    public static Set<User> findAll() {
-        return new HashSet<>(Database.findAll());
+    private final UserFindable userFindable;
+
+    public Set<User> findAll() {
+        return userFindable.findAll();
     }
 }

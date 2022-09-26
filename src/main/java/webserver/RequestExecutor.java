@@ -2,20 +2,24 @@ package webserver;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import user.UserAuthProvider;
 import user.UserController;
+import user.UserFinder;
+import user.UserLocalDBAdapter;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RequestExecutor {
-    private static Map<RequestMapping, RequestProcessable> mappers = new HashMap<>();
+    private final static Map<RequestMapping, RequestProcessable> mappers = new HashMap<>();
 
     static {
-        mappers.put(new RequestMapping(HttpMethod.GET, "/user/create"), UserController::signUpForGet);
-        mappers.put(new RequestMapping(HttpMethod.POST, "/user/create"), UserController::signUpForPost);
-        mappers.put(new RequestMapping(HttpMethod.POST, "/user/login"), UserController::login);
-        mappers.put(new RequestMapping(HttpMethod.GET, "/user/list"), UserController::findAllUser);
+        UserController userController = getUserController();
+        mappers.put(new RequestMapping(HttpMethod.GET, "/user/create"), userController::signUpForGet);
+        mappers.put(new RequestMapping(HttpMethod.POST, "/user/create"), userController::signUpForPost);
+        mappers.put(new RequestMapping(HttpMethod.POST, "/user/login"), userController::login);
+        mappers.put(new RequestMapping(HttpMethod.GET, "/user/list"), userController::findAllUser);
     }
 
     public static Response execute(Request request) {
@@ -32,5 +36,10 @@ public class RequestExecutor {
         } catch (Exception e) {
             return Response.serverError(request.getStartLine().getProtocol(), e.getMessage());
         }
+    }
+
+    private static UserController getUserController() {
+        var userAdapter = new UserLocalDBAdapter();
+        return new UserController(new UserAuthProvider(userAdapter, userAdapter), new UserFinder(userAdapter));
     }
 }

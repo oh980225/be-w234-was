@@ -1,23 +1,29 @@
 package user;
 
-import db.Database;
-import user.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class UserAuthProviderTest {
+    private int findByUserIdCallCnt;
+    private int registerCallCnt;
+
     @BeforeEach
     void init() {
-        Database.cleanUp();
+        findByUserIdCallCnt = 0;
+        registerCallCnt = 0;
     }
 
     @Test
-    @DisplayName("회원가입을 진행한다.")
+    @DisplayName("UserFindable로 중복된 아이디의 유저가 없는지 확인후, UserRegisterable로 유저 등록을 진행합니다.")
     void signUp() {
+        var userAuthProvider = getAuthProviderForEmptyUser();
         var request = SignUpRequest.builder()
                 .userId("george.5")
                 .password("password123")
@@ -25,26 +31,16 @@ class UserAuthProviderTest {
                 .email("oh980225@gmail.com")
                 .build();
 
-        UserAuthProvider.signUp(request);
+        userAuthProvider.signUp(request);
 
-        assertThat(Database.findUserById("george.5").get())
-                .isEqualTo(User.builder()
-                        .userId("george.5")
-                        .password("password123")
-                        .name("오승재")
-                        .email("oh980225@gmail.com")
-                        .build());
+        assertThat(findByUserIdCallCnt).isOne();
+        assertThat(registerCallCnt).isOne();
     }
 
     @Test
-    @DisplayName("입력으로 들어온 userId가 이미 존재하여 중복될 경우, UserException이 발생합니다.")
+    @DisplayName("UserFindable로 입력으로 들어온 userId에 해당한 유저를 찾았을 경우 중복이므로, UserException이 발생합니다.")
     void signUp_duplicate_user_id() {
-        Database.addUser(User.builder()
-                .userId("george.5")
-                .password("password456")
-                .name("오승재")
-                .email("oh980225@naver.com")
-                .build());
+        var userAuthProvider = getUserAuthProvider();
         var request = SignUpRequest.builder()
                 .userId("george.5")
                 .password("password123")
@@ -52,33 +48,30 @@ class UserAuthProviderTest {
                 .email("oh980225@gmail.com")
                 .build();
 
-        assertThatThrownBy(() -> UserAuthProvider.signUp(request))
+        assertThatThrownBy(() -> userAuthProvider.signUp(request))
                 .isInstanceOf(UserException.class)
                 .hasMessage(UserErrorMessage.DUPLICATE_USER_ID.getDetail());
     }
 
-    // login에 대한 positive 테스트를 작성하고 싶은데 반환값도 void라 현 상황에서는 쉽지 않네요 🧐
-    // Database 클래스를 좀 건드린 후, 인터페이스를 뽑고, 테스트용 Mock 구현체를 만들어서 호출을 검증하는 정도를 고민 중입니다...
+
     @Test
-    @DisplayName("userId와 password로 로그인을 할 수 있습니다.")
+    @DisplayName("UserFindable로 userId에 해당하는 유저를 찾고 비밀번호를 비교하여 로그인을 진행합니다.")
     void login() {
-        Database.addUser(User.builder()
-                .userId("george.5")
-                .password("password123")
-                .name("오승재")
-                .email("oh980225@naver.com")
-                .build());
+        var userAuthProvider = getUserAuthProvider();
         var request = new LoginRequest("george.5", "password123");
 
-        UserAuthProvider.login(request);
+        userAuthProvider.login(request);
+
+        assertThat(findByUserIdCallCnt).isOne();
     }
 
     @Test
     @DisplayName("로그인하려는 사용자가 존재하지 않는 경우, UserException이 발생합니다.")
     void login_not_exist_user() {
+        var userAuthProvider = getAuthProviderForEmptyUser();
         var request = new LoginRequest("george.5", "password123");
 
-        assertThatThrownBy(() -> UserAuthProvider.login(request))
+        assertThatThrownBy(() -> userAuthProvider.login(request))
                 .isInstanceOf(UserException.class)
                 .hasMessage(UserErrorMessage.NOT_EXIST_USER.getDetail());
     }
@@ -86,17 +79,46 @@ class UserAuthProviderTest {
     @Test
     @DisplayName("로그인 시도시 비밀번호가 틀렸을 경우, UserException이 발생합니다.")
     void login_not_match_password() {
-        Database.addUser(User.builder()
-                .userId("george.5")
-                .password("password456")
-                .name("오승재")
-                .email("oh980225@naver.com")
-                .build());
+        var userAuthProvider = getUserAuthProvider();
+        var request = new LoginRequest("george.5", "password456");
 
-        var request = new LoginRequest("george.5", "password123");
-
-        assertThatThrownBy(() -> UserAuthProvider.login(request))
+        assertThatThrownBy(() -> userAuthProvider.login(request))
                 .isInstanceOf(UserException.class)
                 .hasMessage(UserErrorMessage.NOT_MATCH_PASSWORD.getDetail());
+    }
+
+    private UserAuthProvider getUserAuthProvider() {
+        return new UserAuthProvider(new UserFindable() {
+            @Override
+            public Optional<User> findByUserId(String userId) {
+                findByUserIdCallCnt++;
+                return Optional.of(User.builder()
+                        .userId("george.5")
+                        .password("password123")
+                        .name("오승재")
+                        .email("oh980225@naver.com")
+                        .build());
+            }
+
+            @Override
+            public Set<User> findAll() {
+                return null;
+            }
+        }, (userId) -> registerCallCnt++);
+    }
+
+    private UserAuthProvider getAuthProviderForEmptyUser() {
+        return new UserAuthProvider(new UserFindable() {
+            @Override
+            public Optional<User> findByUserId(String userId) {
+                findByUserIdCallCnt++;
+                return Optional.empty();
+            }
+
+            @Override
+            public Set<User> findAll() {
+                return null;
+            }
+        }, (userId) -> registerCallCnt++);
     }
 }

@@ -1,36 +1,34 @@
 package user;
 
-import db.Database;
-import user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import user.UserFinder;
 
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UserFinderTest {
+    private int findAllCallCnt = 0;
+
     @Test
-    @DisplayName("모든 사용자를 찾는다.")
+    @DisplayName("UserFindable를 이용하여 모든 사용자를 조회한다.")
     void findAll() {
-        var user1 = User.builder()
-                .userId("george.5")
-                .password("password456")
-                .name("오승재")
-                .email("oh980225@naver.com")
-                .build();
-        var user2 = User.builder()
-                .userId("oh980225")
-                .password("password123")
-                .name("오승재")
-                .email("oh980225@gmail.com")
-                .build();
-        Database.addUser(user1);
-        Database.addUser(user2);
+        var userFinder = new UserFinder(new UserFindable() {
+            @Override
+            public Optional<User> findByUserId(String userId) {
+                return Optional.empty();
+            }
 
-        var actual = UserFinder.findAll();
+            @Override
+            public Set<User> findAll() {
+                findAllCallCnt++;
+                return null;
+            }
+        });
 
-        assertThat(actual).isEqualTo(Set.of(user1, user2));
+        userFinder.findAll();
+
+        assertThat(findAllCallCnt).isOne();
     }
 }
