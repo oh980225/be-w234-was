@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import user.UserAuthProvider;
 import user.UserController;
 import user.UserFinder;
-import user.UserLocalDBAdapter;
+import user.UserJDBCAdapter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +39,7 @@ public class RequestExecutor {
     }
 
     private static UserController getUserController() {
-        var userAdapter = new UserLocalDBAdapter();
+        var userAdapter = new UserJDBCAdapter();
         return new UserController(new UserAuthProvider(userAdapter, userAdapter), new UserFinder(userAdapter));
     }
 }
