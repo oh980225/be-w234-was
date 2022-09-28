@@ -28,12 +28,12 @@ class MemoFinderTest {
                     .id(1L)
                     .contents("오늘은 열심히 개발을 합시다.")
                     .localDate(LocalDate.now())
-                    .userId(writer.getUserId())
+                    .authorId(writer.getUserId())
                     .build(), Memo.builder()
                     .id(2L)
                     .contents("오늘은 열심히 게임을 합시다.")
                     .localDate(LocalDate.now())
-                    .userId(writer.getUserId())
+                    .authorId(writer.getUserId())
                     .build());
         });
 

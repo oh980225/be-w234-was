@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Value
 public class Memo {
     Long id;
-    String userId;
+    String authorId;
     String contents;
     LocalDate localDate;
 }

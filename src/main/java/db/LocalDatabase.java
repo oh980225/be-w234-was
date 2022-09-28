@@ -7,7 +7,7 @@ import user.User;
 import java.util.Collection;
 import java.util.Map;
 
-public class Database {
+public class LocalDatabase {
     private static Map<String, User> users = Maps.newHashMap();
 
     public static void addUser(User user) {
