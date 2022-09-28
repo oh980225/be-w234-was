@@ -9,6 +9,6 @@ public class MemoFinder {
     private final MemoFindable memoFindable;
 
     public List<Memo> findAll() {
-        return memoFindable.findAll();
+        return memoFindable.findAllBySorted();
     }
 }

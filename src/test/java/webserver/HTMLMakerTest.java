@@ -12,7 +12,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class HTMLTableMakerTest {
+class HTMLMakerTest {
     private static final String EMPTY_TABLE_PATH = "src/test/java/static/test_empty_table.html";
     private static final String USER_TABLE_PATH = "src/test/java/static/test_user_table.html";
     private static final String UNEXPECTED_HTML_PATH = "src/test/java/static/test.html";
@@ -34,7 +34,7 @@ class HTMLTableMakerTest {
                 .email("oh980225@naver.com")
                 .build();
 
-        var actual = HTMLTableMaker.makeUserTable(EMPTY_TABLE_PATH, List.of(user1, user2));
+        var actual = HTMLMaker.makeUserTable(EMPTY_TABLE_PATH, List.of(user1, user2));
 
         assertThat(actual).isEqualTo(Jsoup.parse(new File(USER_TABLE_PATH), "UTF-8").html());
     }
@@ -55,7 +55,7 @@ class HTMLTableMakerTest {
                 .email("oh980225@naver.com")
                 .build();
 
-        assertThatThrownBy(() -> HTMLTableMaker.makeUserTable(UNEXPECTED_HTML_PATH, List.of(user1, user2)))
+        assertThatThrownBy(() -> HTMLMaker.makeUserTable(UNEXPECTED_HTML_PATH, List.of(user1, user2)))
                 .isInstanceOf(WebServerException.class)
                 .hasMessage(WebServerErrorMessage.UNEXPECTED_HTML.getDetail());
     }

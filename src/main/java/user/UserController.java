@@ -2,7 +2,7 @@ package user;
 
 import lombok.RequiredArgsConstructor;
 import webserver.ContentType;
-import webserver.HTMLTableMaker;
+import webserver.HTMLMaker;
 import webserver.Request;
 import webserver.Response;
 
@@ -73,7 +73,7 @@ public class UserController {
         return Response.okWithData(
                 request.getStartLine().getProtocol(),
                 ContentType.TEXT_HTML,
-                HTMLTableMaker.makeUserTable(USER_LIST_PATH, allUser).getBytes());
+                HTMLMaker.makeUserTable(USER_LIST_PATH, allUser).getBytes());
     }
 
     private static String makeUserIdCookie(Map<String, String> body) {

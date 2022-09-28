@@ -27,6 +27,7 @@ public class RequestExecutor {
         mappers.put(new RequestMapping(HttpMethod.POST, "/user/create"), userController::signUpForPost);
         mappers.put(new RequestMapping(HttpMethod.POST, "/user/login"), userController::login);
         mappers.put(new RequestMapping(HttpMethod.GET, "/user/list"), userController::findAllUser);
+        mappers.put(new RequestMapping(HttpMethod.GET, "/index.html"), memoController::getMemoListView);
         mappers.put(new RequestMapping(HttpMethod.POST, "/memo"), memoController::writeMemo);
     }
 

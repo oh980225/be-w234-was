@@ -8,15 +8,15 @@ import java.util.List;
 import static db.MySQLInfo.*;
 
 public class MemoJDBCAdapter implements MemoFindable, MemoWritable {
-    private static final String FIND_ALL_SQL = "SELECT * FROM memo";
+    private static final String FIND_ALL_SORTED_SQL = "SELECT * FROM memo ORDER BY create_date DESC, id DESC";
     private static final String INSERT_SQL = "INSERT INTO MEMO(author_id, contents, create_date) VALUES (?, ?, ?)";
 
     @Override
-    public List<Memo> findAll() {
+    public List<Memo> findAllBySorted() {
         List<Memo> memoList = new ArrayList<>();
 
         try (Connection connection = DriverManager.getConnection(URL.getDetail(), USER.getDetail(), PASSWORD.getDetail());
-             PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL);
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SORTED_SQL);
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
             makeAllMemoList(memoList, resultSet);
