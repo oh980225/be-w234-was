@@ -13,7 +13,7 @@ public class RequestStartLine {
 
     private final Protocol protocol;
 
-    private static final Pattern REGEX = Pattern.compile("(\\S+)\\s(\\S+)\\s(\\S+)");
+    private static final Pattern REGEX = Pattern.compile("(GET|get|POST|post)\\s(\\/\\S*)\\s(HTTP/1.1)");
 
     public RequestStartLine(String readLine) {
         if (Strings.isNullOrEmpty(readLine)) {
