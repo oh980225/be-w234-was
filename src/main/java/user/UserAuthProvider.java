@@ -1,14 +1,14 @@
-package webserver;
+package user;
 
-import db.Database;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import model.User;
+import lombok.RequiredArgsConstructor;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class UserAuthProvider {
-    public static void signUp(SignUpRequest signUpRequest) {
-        if (Database.findUserById(signUpRequest.getUserId()).isPresent()) {
+    private final UserFindable userFindable;
+    private final UserRegisterable userRegisterable;
+
+    void signUp(SignUpRequest signUpRequest) {
+        if (userFindable.findByUserId(signUpRequest.getUserId()).isPresent()) {
             throw new UserException(UserErrorMessage.DUPLICATE_USER_ID);
         }
 
@@ -19,11 +19,11 @@ public class UserAuthProvider {
                 .email(signUpRequest.getEmail())
                 .build();
 
-        Database.addUser(newUser);
+        userRegisterable.register(newUser);
     }
 
-    public static void login(LoginRequest loginRequest) {
-        var existedUser = Database.findUserById(loginRequest.getUserId())
+    void login(LoginRequest loginRequest) {
+        var existedUser = userFindable.findByUserId(loginRequest.getUserId())
                 .orElseThrow(() -> new UserException(UserErrorMessage.NOT_EXIST_USER));
 
         if (!existedUser.getPassword().equals(loginRequest.getPassword())) {

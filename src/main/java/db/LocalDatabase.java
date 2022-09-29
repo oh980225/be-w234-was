@@ -2,28 +2,23 @@ package db;
 
 import com.google.common.collect.Maps;
 
-import model.User;
+import user.User;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 
-public class Database {
+public class LocalDatabase {
     private static Map<String, User> users = Maps.newHashMap();
 
     public static void addUser(User user) {
         users.put(user.getUserId(), user);
     }
 
-    public static Optional<User> findUserById(String userId) {
-        return Optional.ofNullable(users.get(userId));
+    public static User findUserByUserId(String userId) {
+        return users.get(userId);
     }
 
     public static Collection<User> findAll() {
         return users.values();
-    }
-
-    public static void cleanUp() {
-        users = Maps.newHashMap();
     }
 }
