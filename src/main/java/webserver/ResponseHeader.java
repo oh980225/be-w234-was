@@ -15,14 +15,14 @@ public class ResponseHeader {
 
     @Override
     public String toString() {
-        String headerString = "";
+        StringBuilder headerString = new StringBuilder();
 
         for (Map.Entry<ResponseHeaderOption, String> entry : contents.entrySet()) {
-            headerString += (contents.get(entry.getKey()) != null
-                    ? entry.getKey().getDetail() + ": " + entry.getValue() + "\r\n"
+            headerString.append(contents.get(entry.getKey()) != null
+                    ? String.format("%s: %s\n", entry.getKey().getDetail(), entry.getValue())
                     : "");
         }
 
-        return headerString;
+        return headerString.toString();
     }
 }
