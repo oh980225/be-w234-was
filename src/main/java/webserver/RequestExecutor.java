@@ -34,8 +34,8 @@ public class RequestExecutor {
     public static Response execute(Request request) {
         try {
             var requestMapping = new RequestMapping(
-                    request.getStartLine().getMethod(),
-                    request.getStartLine().getUrl().getPath());
+                    request.getMethod(),
+                    request.getUrl().getPath());
 
             if (mappers.get(requestMapping) == null) {
                 return PageController.getPage(request);
@@ -43,7 +43,7 @@ public class RequestExecutor {
 
             return mappers.get(requestMapping).process(request);
         } catch (Exception e) {
-            return Response.serverError(request.getStartLine().getProtocol(), e.getMessage());
+            return Response.serverError(request.getProtocol(), e.getMessage());
         }
     }
 

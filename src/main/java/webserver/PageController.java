@@ -12,14 +12,14 @@ public class PageController {
 
     public static Response getPage(Request request) throws IOException {
         try {
-            var targetFile = PageLoader.getPageByPath(STATIC_FILE_PATH + request.getStartLine().getUrl().getPath());
+            var targetFile = PageLoader.getPageByPath(STATIC_FILE_PATH + request.getUrl().getPath());
 
             return Response.okWithData(
-                    request.getStartLine().getProtocol(),
+                    request.getProtocol(),
                     ContentType.findByExtension(new Extension(targetFile.toPath().toString())),
                     Files.readAllBytes(targetFile.toPath()));
         } catch (WebServerException e) {
-            return Response.notFound(request.getStartLine().getProtocol());
+            return Response.notFound(request.getProtocol());
         }
     }
 }

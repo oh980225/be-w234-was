@@ -19,21 +19,21 @@ public class MemoController {
 
 
     public Response writeMemo(Request request) {
-        var userIdInCookie = request.getHeader().getCookie().getUserId();
+        var userIdInCookie = request.getCookie().getUserId();
         if (userIdInCookie.isEmpty()) {
-            return Response.redirect(request.getStartLine().getProtocol(), LOGIN_PATH);
+            return Response.redirect(request.getProtocol(), LOGIN_PATH);
         }
 
         memoWriter.write(userIdInCookie.get(), request.getBody().get("contents"));
 
-        return Response.redirect(request.getStartLine().getProtocol(), INDEX_PATH);
+        return Response.redirect(request.getProtocol(), INDEX_PATH);
     }
 
     public Response getMemoListView(Request request) throws IOException {
         var memoList = memoFinder.findAll();
 
         return Response.okWithData(
-                request.getStartLine().getProtocol(),
+                request.getProtocol(),
                 ContentType.TEXT_HTML,
                 HTMLMaker.makeMemoListView(STATIC_FILE_PATH + "/index.html", memoList).getBytes());
     }

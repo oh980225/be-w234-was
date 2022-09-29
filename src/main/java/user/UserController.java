@@ -20,7 +20,7 @@ public class UserController {
 
     public Response signUpForGet(Request request) {
         try {
-            var query = request.getStartLine().getUrl().getQuery();
+            var query = request.getUrl().getQuery();
 
             userAuthProvider.signUp(SignUpRequest.builder()
                     .userId(query.get("userId"))
@@ -28,9 +28,9 @@ public class UserController {
                     .name(query.get("name"))
                     .email(query.get("email"))
                     .build());
-            return Response.ok(request.getStartLine().getProtocol());
+            return Response.ok(request.getProtocol());
         } catch (UserException e) {
-            return Response.badRequest(request.getStartLine().getProtocol(), e.getMessage());
+            return Response.badRequest(request.getProtocol(), e.getMessage());
         }
     }
 
@@ -45,9 +45,9 @@ public class UserController {
                     .email(body.get("email"))
                     .build());
 
-            return Response.redirect(request.getStartLine().getProtocol(), INDEX_PATH);
+            return Response.redirect(request.getProtocol(), INDEX_PATH);
         } catch (UserException e) {
-            return Response.badRequest(request.getStartLine().getProtocol(), e.getMessage());
+            return Response.badRequest(request.getProtocol(), e.getMessage());
         }
     }
 
@@ -57,21 +57,21 @@ public class UserController {
 
             userAuthProvider.login(new LoginRequest(body.get("userId"), body.get("password")));
 
-            return Response.redirectWithCookie(request.getStartLine().getProtocol(), INDEX_PATH, makeUserIdCookie(body));
+            return Response.redirectWithCookie(request.getProtocol(), INDEX_PATH, makeUserIdCookie(body));
         } catch (UserException e) {
-            return Response.redirect(request.getStartLine().getProtocol(), LOGIN_FAIL_PATH);
+            return Response.redirect(request.getProtocol(), LOGIN_FAIL_PATH);
         }
     }
 
     public Response findAllUser(Request request) throws IOException {
-        if (request.getHeader().getCookie().getUserId().isEmpty()) {
-            return Response.redirect(request.getStartLine().getProtocol(), LOGIN_PATH);
+        if (request.getCookie().getUserId().isEmpty()) {
+            return Response.redirect(request.getProtocol(), LOGIN_PATH);
         }
 
         var allUser = userFinder.findAll();
 
         return Response.okWithData(
-                request.getStartLine().getProtocol(),
+                request.getProtocol(),
                 ContentType.TEXT_HTML,
                 HTMLMaker.makeUserTable(USER_LIST_PATH, allUser).getBytes());
     }
