@@ -1,14 +1,17 @@
 package webserver;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter
-@RequiredArgsConstructor
 public class ResponseHeader {
-    private final Map<ResponseHeaderOption, String> contents;
+    private final Map<ResponseHeaderOption, String> contents = new HashMap<>();
+
+    public void putContents(ResponseHeaderOption key, String value) {
+        contents.put(key, value);
+    }
 
     @Override
     public String toString() {

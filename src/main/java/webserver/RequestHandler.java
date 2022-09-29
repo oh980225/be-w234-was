@@ -65,7 +65,7 @@ public class RequestHandler implements Runnable {
     }
 
     private RequestHeader getRequestHeader(BufferedReader br) throws IOException {
-        Map<String, String> content = new HashMap<>();
+        var requestHeader = new RequestHeader();
         String readLine;
 
         while (true) {
@@ -76,10 +76,10 @@ public class RequestHandler implements Runnable {
             }
 
             var splitLine = readLine.split(": ");
-            content.put(splitLine[0], splitLine[1]);
+            requestHeader.putContent(splitLine[0], splitLine[1]);
         }
 
-        return new RequestHeader(content);
+        return requestHeader;
     }
 
     private void writeResponseToOutputStream(DataOutputStream dos, Response response) throws IOException {

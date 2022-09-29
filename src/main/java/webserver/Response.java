@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Builder(access = AccessLevel.PRIVATE)
@@ -20,11 +18,9 @@ public class Response {
     private final static String NOT_FOUND_CONTENT = "NOT FOUND PAGE";
 
     public static Response okWithData(Protocol protocol, ContentType contentType, byte[] body) {
-        var headerMap = getHeaderMapForContent(contentType, body.length);
-
         return Response.builder()
                 .statusLine(new ResponseStatusLine(protocol, StatusCode.OK))
-                .header(new ResponseHeader(headerMap))
+                .header(makeHeaderWithContentTypeAndBody(contentType, body))
                 .body(body)
                 .build();
     }
@@ -36,56 +32,47 @@ public class Response {
     }
 
     public static Response badRequest(Protocol protocol, String message) {
-        var headerMap =
-                getHeaderMapForContent(ContentType.TEXT_HTML, message.getBytes().length);
-
         return Response.builder()
                 .statusLine(new ResponseStatusLine(protocol, StatusCode.BAD_REQUEST))
-                .header(new ResponseHeader(headerMap))
+                .header(makeHeaderWithContentTypeAndBody(ContentType.TEXT_HTML, message.getBytes()))
                 .body(message.getBytes())
                 .build();
     }
 
     public static Response notFound(Protocol protocol) {
-        var headerMap =
-                getHeaderMapForContent(ContentType.TEXT_HTML, NOT_FOUND_CONTENT.getBytes().length);
-
         return Response.builder()
                 .statusLine(new ResponseStatusLine(protocol, StatusCode.NOT_FOUND))
-                .header(new ResponseHeader(headerMap))
+                .header(makeHeaderWithContentTypeAndBody(ContentType.TEXT_HTML, NOT_FOUND_CONTENT.getBytes()))
                 .body(NOT_FOUND_CONTENT.getBytes())
                 .build();
     }
 
     public static Response redirect(Protocol protocol, String location) {
-        Map<ResponseHeaderOption, String> headerMap = new HashMap<>();
-        headerMap.put(ResponseHeaderOption.LOCATION, location);
+        var header = new ResponseHeader();
+        header.putContents(ResponseHeaderOption.LOCATION, location);
 
         return Response.builder()
                 .statusLine(new ResponseStatusLine(protocol, StatusCode.REDIRECT))
-                .header(new ResponseHeader(headerMap))
+                .header(header)
                 .build();
     }
 
     public static Response redirectWithCookie(Protocol protocol, String location, String cookieContents) {
-        Map<ResponseHeaderOption, String> headerMap = new HashMap<>();
-        headerMap.put(ResponseHeaderOption.SET_COOKIE, cookieContents);
-        headerMap.put(ResponseHeaderOption.LOCATION, location);
+        var header = new ResponseHeader();
+        header.putContents(ResponseHeaderOption.SET_COOKIE, cookieContents);
+        header.putContents(ResponseHeaderOption.LOCATION, location);
 
 
         return Response.builder()
                 .statusLine(new ResponseStatusLine(protocol, StatusCode.REDIRECT))
-                .header(new ResponseHeader(headerMap))
+                .header(header)
                 .build();
     }
 
     public static Response serverError(Protocol protocol, String message) {
-        var headerMap =
-                getHeaderMapForContent(ContentType.TEXT_HTML, message.getBytes().length);
-
         return Response.builder()
                 .statusLine(new ResponseStatusLine(protocol, StatusCode.SERVER_ERROR))
-                .header(new ResponseHeader(headerMap))
+                .header(makeHeaderWithContentTypeAndBody(ContentType.TEXT_HTML, message.getBytes()))
                 .body(message.getBytes())
                 .build();
     }
@@ -98,11 +85,10 @@ public class Response {
         return Optional.ofNullable(body);
     }
 
-    private static Map<ResponseHeaderOption, String> getHeaderMapForContent(ContentType contentType, int contentLength) {
-        Map<ResponseHeaderOption, String> headerMap = new HashMap<>();
-        headerMap.put(ResponseHeaderOption.CONTENT_TYPE, contentType.getDetail());
-        headerMap.put(ResponseHeaderOption.CONTENT_LENGTH, String.valueOf(contentLength));
-
-        return headerMap;
+    private static ResponseHeader makeHeaderWithContentTypeAndBody(ContentType contentType, byte[] body) {
+        var header = new ResponseHeader();
+        header.putContents(ResponseHeaderOption.CONTENT_TYPE, contentType.getDetail());
+        header.putContents(ResponseHeaderOption.CONTENT_LENGTH, String.valueOf(body.length));
+        return header;
     }
 }
