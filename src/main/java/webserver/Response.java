@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Optional;
 
 @Builder(access = AccessLevel.PRIVATE)
@@ -83,6 +85,32 @@ public class Response {
 
     public Optional<byte[]> getBody() {
         return Optional.ofNullable(body);
+    }
+
+    public void flush(DataOutputStream dos) throws IOException {
+        writeStatusLine(dos);
+        writeHeader(dos);
+        writeBody(dos);
+        dos.flush();
+    }
+
+    private void writeStatusLine(DataOutputStream dos) throws IOException {
+        dos.writeBytes(statusLine.toString() + "\r\n");
+    }
+
+    private void writeHeader(DataOutputStream dos) throws IOException {
+        if (getHeader().isPresent()) {
+            dos.writeBytes(header.toString());
+        }
+    }
+
+    private void writeBody(DataOutputStream dos) throws IOException {
+        if (getBody().isPresent() && getHeader().isPresent()) {
+            dos.writeBytes("\r\n");
+            dos.write(body,
+                    0,
+                    Integer.parseInt(header.getContents().get(ResponseHeaderOption.CONTENT_LENGTH)));
+        }
     }
 
     private static ResponseHeader makeHeaderWithContentTypeAndBody(ContentType contentType, byte[] body) {

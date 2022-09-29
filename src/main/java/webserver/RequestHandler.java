@@ -32,8 +32,7 @@ public class RequestHandler implements Runnable {
 
             var response = RequestExecutor.execute(getRequest(br));
 
-            writeResponseToOutputStream(dos, response);
-            dos.flush();
+            response.flush(dos);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -80,32 +79,5 @@ public class RequestHandler implements Runnable {
         }
 
         return requestHeader;
-    }
-
-    private void writeResponseToOutputStream(DataOutputStream dos, Response response) throws IOException {
-        writeReponseStatusLine(dos, response);
-
-        writeResponseHeader(dos, response);
-
-        writeResponseBody(dos, response);
-    }
-
-    private void writeReponseStatusLine(DataOutputStream dos, Response response) throws IOException {
-        dos.writeBytes(response.getStatusLine().toString() + "\r\n");
-    }
-
-    private void writeResponseHeader(DataOutputStream dos, Response response) throws IOException {
-        if (response.getHeader().isPresent()) {
-            dos.writeBytes(response.getHeader().get().toString());
-        }
-    }
-
-    private void writeResponseBody(DataOutputStream dos, Response response) throws IOException {
-        if (response.getBody().isPresent() && response.getHeader().isPresent()) {
-            dos.writeBytes("\r\n");
-            dos.write(response.getBody().get(),
-                    0,
-                    Integer.parseInt(response.getHeader().get().getContents().get(ResponseHeaderOption.CONTENT_LENGTH)));
-        }
     }
 }
